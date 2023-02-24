@@ -18,5 +18,5 @@ def test_get_graph():
 def test_create_and_save_two_cycles_graph():
     graph = graph_utils.create_two_cycles_graph(42, 29, labels=("a", "d"))
     graph_utils.save_graph_as_pydot(graph, "tmp_two_cycles_graph_42_29")
-    assert filecmp.cmp("./tmp_two_cycles_graph_42_29", "./test_graph_utils_two_cycles_graph_42_29_expected")
-    os.remove("./tmp_two_cycles_graph_42_29")
+    assert filecmp.cmp("tmp_two_cycles_graph_42_29", "./tests/test_graph_utils_two_cycles_graph_42_29_expected")
+    os.remove("tmp_two_cycles_graph_42_29")
