@@ -9,7 +9,11 @@ class Graph:
         self.labels = labels
 
     def __eq__(self, other):
-        return self.nodes == other.nodes and self.edges == other.edges and self.labels == other.labels
+        return (
+            self.nodes == other.nodes
+            and self.edges == other.edges
+            and self.labels == other.labels
+        )
 
     def labels_to_list(self):
         return list([label for _, _, label in self.labels])
@@ -18,7 +22,9 @@ class Graph:
 def get_graph(name: str) -> Graph:
     graph_path = cfpq.download(name)
     graph = cfpq.graph_from_csv(graph_path)
-    return Graph(graph.number_of_nodes(), graph.number_of_edges(), graph.edges(data="label"))
+    return Graph(
+        graph.number_of_nodes(), graph.number_of_edges(), graph.edges(data="label")
+    )
 
 
 def create_two_cycles_graph(n: int, m: int, labels) -> networkx.MultiDiGraph:
