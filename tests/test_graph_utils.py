@@ -3,21 +3,23 @@ import os
 from project import graph_utils
 
 
-def test_get_graph():
-    graph_pr = graph_utils.get_graph("pr")
-    assert graph_pr.nodes == 815
-    assert graph_pr.edges == 692
-    assert set(graph_pr.labels_to_list()) == {"a", "d"}
+def test_get_graphs_info_with_names_pr_and_ls():
+    def _inner_test_get_graphs_info_with_names_pr_and_ls(
+        name: str, nodes: int, edges: int, labels: set
+    ):
+        graph = graph_utils.get_graph_info_by_name(name)
+        assert graph.nodes == nodes
+        assert graph.edges == edges
+        assert set(graph.labels_to_list()) == labels
 
-    graph_pr = graph_utils.get_graph("ls")
-    assert graph_pr.nodes == 1687
-    assert graph_pr.edges == 1453
-    assert set(graph_pr.labels_to_list()) == {"a", "d"}
+    _inner_test_get_graphs_info_with_names_pr_and_ls("pr", 815, 692, {"a", "d"})
+    _inner_test_get_graphs_info_with_names_pr_and_ls("ls", 1687, 1453, {"a", "d"})
 
 
 def test_create_and_save_two_cycles_graph():
-    graph = graph_utils.create_two_cycles_graph(42, 29, labels=("a", "d"))
-    graph_utils.save_graph_as_pydot(graph, "tmp_two_cycles_graph_42_29")
+    graph_utils.create_and_save_two_cycles_graph_as_pydot(
+        42, 29, labels=("a", "d"), path="tmp_two_cycles_graph_42_29"
+    )
     assert filecmp.cmp(
         "tmp_two_cycles_graph_42_29",
         "./tests/test_graph_utils_two_cycles_graph_42_29_expected",

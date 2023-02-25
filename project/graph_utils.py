@@ -2,7 +2,7 @@ import cfpq_data as cfpq
 import networkx
 
 
-class Graph:
+class GraphInfo:
     def __init__(self, nodes, edges, labels):
         self.nodes = nodes
         self.edges = edges
@@ -19,10 +19,10 @@ class Graph:
         return list([label for _, _, label in self.labels])
 
 
-def get_graph(name: str) -> Graph:
+def get_graph_info_by_name(name: str) -> GraphInfo:
     graph_path = cfpq.download(name)
     graph = cfpq.graph_from_csv(graph_path)
-    return Graph(
+    return GraphInfo(
         graph.number_of_nodes(), graph.number_of_edges(), graph.edges(data="label")
     )
 
@@ -34,3 +34,8 @@ def create_two_cycles_graph(n: int, m: int, labels) -> networkx.MultiDiGraph:
 def save_graph_as_pydot(graph: networkx.MultiDiGraph, path: str):
     pydot_graph = networkx.nx_pydot.to_pydot(graph)
     pydot_graph.write_raw(path)
+
+
+def create_and_save_two_cycles_graph_as_pydot(n: int, m: int, labels, path: str):
+    graph = cfpq.labeled_two_cycles_graph(n, m, labels=labels)
+    save_graph_as_pydot(graph, path)
