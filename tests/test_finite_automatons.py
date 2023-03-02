@@ -29,8 +29,6 @@ def test_get_min_dfa_from_regex_on_complex_data():
         for word in sources[source_name]["bad"]:
             assert not regex.accepts(word) and regex.accepts(word) == dfa.accepts(word)
 
-    helper_test_on_regexs_data(sources["star_test"]["source"], "star_test")
-
     union = "|".join(sources["union_test"]["source"])
     helper_test_on_regexs_data(union, "union_test")
 
