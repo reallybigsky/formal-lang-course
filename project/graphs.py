@@ -10,9 +10,9 @@ class GraphInfo:
 
     def __eq__(self, other):
         return (
-                self.nodes == other.nodes
-                and self.edges == other.edges
-                and self.labels == other.labels
+            self.nodes == other.nodes
+            and self.edges == other.edges
+            and self.labels == other.labels
         )
 
     def labels_to_list(self):

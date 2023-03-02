@@ -15,7 +15,9 @@ def get_min_dfa_from_regex(expr: str) -> DeterministicFiniteAutomaton:
     return regex.to_epsilon_nfa().minimize()
 
 
-def get_nfa_from_graph(graph: nx.MultiDiGraph, start_nodes: set = None, final_nodes: set = None) -> NondeterministicFiniteAutomaton:
+def get_nfa_from_graph(
+    graph: nx.MultiDiGraph, start_nodes: set = None, final_nodes: set = None
+) -> NondeterministicFiniteAutomaton:
     """
     Builds Nondeterministic Finite Automaton from directed graph
 
