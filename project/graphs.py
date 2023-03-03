@@ -1,5 +1,5 @@
 import cfpq_data as cfpq
-import networkx
+import networkx as nx
 
 
 class GraphInfo:
@@ -19,20 +19,25 @@ class GraphInfo:
         return list([label for _, _, label in self.labels])
 
 
-def get_graph_info_by_name(name: str) -> GraphInfo:
+def get_nx_graph_by_name(name: str) -> nx.MultiDiGraph:
     graph_path = cfpq.download(name)
     graph = cfpq.graph_from_csv(graph_path)
+    return graph
+
+
+def get_graph_info_by_name(name: str) -> GraphInfo:
+    graph = get_nx_graph_by_name(name)
     return GraphInfo(
         graph.number_of_nodes(), graph.number_of_edges(), graph.edges(data="label")
     )
 
 
-def create_two_cycles_graph(n: int, m: int, labels) -> networkx.MultiDiGraph:
+def create_two_cycles_graph(n: int, m: int, labels) -> nx.MultiDiGraph:
     return cfpq.labeled_two_cycles_graph(n, m, labels=labels)
 
 
-def save_graph_as_pydot(graph: networkx.MultiDiGraph, path: str):
-    pydot_graph = networkx.nx_pydot.to_pydot(graph)
+def save_graph_as_pydot(graph: nx.MultiDiGraph, path: str):
+    pydot_graph = nx.nx_pydot.to_pydot(graph)
     pydot_graph.write_raw(path)
 
 

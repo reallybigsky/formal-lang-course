@@ -1,13 +1,13 @@
 import filecmp
 import os
-from project import graph_utils
+from project import graphs
 
 
 def test_get_graph_info_by_name():
     def _inner_test_get_graph_info_by_name(
         name: str, nodes: int, edges: int, labels: set
     ):
-        graph = graph_utils.get_graph_info_by_name(name)
+        graph = graphs.get_graph_info_by_name(name)
         assert graph.nodes == nodes
         assert graph.edges == edges
         assert set(graph.labels_to_list()) == labels
@@ -17,7 +17,7 @@ def test_get_graph_info_by_name():
 
 
 def test_create_and_save_two_cycles_graph_as_pydot():
-    graph_utils.create_and_save_two_cycles_graph_as_pydot(
+    graphs.create_and_save_two_cycles_graph_as_pydot(
         42, 29, labels=("a", "d"), path="tmp_two_cycles_graph_42_29"
     )
     assert filecmp.cmp(
