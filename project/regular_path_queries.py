@@ -11,6 +11,7 @@ class BooleanDecomposition:
     """
     Boolean decomposition of the finite automata
     """
+
     def __init__(self, symbols_matrices: dict, states: list):
         """
         :param symbols_matrices: dict - edge symbol to its adjacency matrix
@@ -55,22 +56,30 @@ def boolean_decomposition_from_enfa(enfa: EpsilonNFA) -> BooleanDecomposition:
             try:
                 iter(dest)
             except TypeError:
-                boolean_decompose[symbol].append((enfa_states.index(source), enfa_states.index(dest)))
+                boolean_decompose[symbol].append(
+                    (enfa_states.index(source), enfa_states.index(dest))
+                )
             else:
                 for d in dest:
-                    boolean_decompose[symbol].append((enfa_states.index(source), enfa_states.index(d)))
+                    boolean_decompose[symbol].append(
+                        (enfa_states.index(source), enfa_states.index(d))
+                    )
 
     coo_matrices = dict()
     for (symbol, edges) in boolean_decompose.items():
         row = np.array([i for (i, _) in edges])
         col = np.array([j for (_, j) in edges])
         data = np.array([1 for _ in range(len(edges))])
-        coo_matrices[symbol] = coo_matrix((data, (row, col)), shape=(len(enfa.states), len(enfa.states)))
+        coo_matrices[symbol] = coo_matrix(
+            (data, (row, col)), shape=(len(enfa.states), len(enfa.states))
+        )
 
     return BooleanDecomposition(coo_matrices, enfa_states)
 
 
-def kron_boolean_decomposition(dcmps_lhs: BooleanDecomposition, dcmps_rhs: BooleanDecomposition) -> BooleanDecomposition:
+def kron_boolean_decomposition(
+    dcmps_lhs: BooleanDecomposition, dcmps_rhs: BooleanDecomposition
+) -> BooleanDecomposition:
     """
     Calculate kronecker prod between two matrices` boolean decompositions. Matrices must have same symbols
     :param dcmps_lhs: left argument of kron prod
@@ -127,7 +136,9 @@ def intersect_enfa(enfa_lhs: EpsilonNFA, enfa_rhs: EpsilonNFA) -> EpsilonNFA:
     for (symbol, matrix) in intersect_dcmps.to_dict().items():
         (rows, cols, _) = find(matrix)
         for i in range(len(cols)):
-            result.add_transition(intersect_states[rows[i]], symbol, intersect_states[cols[i]])
+            result.add_transition(
+                intersect_states[rows[i]], symbol, intersect_states[cols[i]]
+            )
 
     for start_state in start_states:
         result.add_start_state(start_state)
@@ -138,7 +149,12 @@ def intersect_enfa(enfa_lhs: EpsilonNFA, enfa_rhs: EpsilonNFA) -> EpsilonNFA:
     return result
 
 
-def regular_path_query(regex_str: str, graph: nx.MultiDiGraph, start_states: list = None, final_states: list = None) -> set:
+def regular_path_query(
+    regex_str: str,
+    graph: nx.MultiDiGraph,
+    start_states: list = None,
+    final_states: list = None,
+) -> set:
     """
     Perform a rpq in a given graph with regex
     :param regex_str: string containing regex
@@ -148,7 +164,9 @@ def regular_path_query(regex_str: str, graph: nx.MultiDiGraph, start_states: lis
     :return: set of tuples which satisfies given rpq. First elements are start states and second are final states
     """
     min_dfa = finite_automatons.get_min_dfa_from_regex(regex_str)
-    intersect = intersect_enfa(finite_automatons.get_nfa_from_graph(graph, start_states, final_states), min_dfa)
+    intersect = intersect_enfa(
+        finite_automatons.get_nfa_from_graph(graph, start_states, final_states), min_dfa
+    )
     result = set()
     net = intersect.to_networkx()
     for start in intersect.start_states:

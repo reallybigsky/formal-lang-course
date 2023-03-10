@@ -3,7 +3,9 @@ from pyformlang.finite_automaton import EpsilonNFA
 from networkx import MultiDiGraph
 
 
-def create_automata(transitions: List[tuple], start_states: List, final_states: List) -> EpsilonNFA:
+def create_automata(
+    transitions: List[tuple], start_states: List, final_states: List
+) -> EpsilonNFA:
     automaton = EpsilonNFA()
     automaton.add_transitions(transitions)
     for ss in start_states:
