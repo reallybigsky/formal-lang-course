@@ -1,6 +1,5 @@
 from pyformlang.regular_expression import Regex
-from pyformlang.finite_automaton import DeterministicFiniteAutomaton
-from pyformlang.finite_automaton import NondeterministicFiniteAutomaton
+from pyformlang.finite_automaton import DeterministicFiniteAutomaton, EpsilonNFA
 import networkx as nx
 
 
@@ -17,7 +16,7 @@ def get_min_dfa_from_regex(expr: str) -> DeterministicFiniteAutomaton:
 
 def get_nfa_from_graph(
     graph: nx.MultiDiGraph, start_nodes: set = None, final_nodes: set = None
-) -> NondeterministicFiniteAutomaton:
+) -> EpsilonNFA:
     """
     Builds Nondeterministic Finite Automaton from directed graph
 
@@ -26,7 +25,7 @@ def get_nfa_from_graph(
     :param final_nodes: set of final state nodes
     :return: NFA
     """
-    nfa = NondeterministicFiniteAutomaton()
+    nfa = EpsilonNFA()
     if final_nodes is None:
         final_nodes = set(graph.nodes)
     if start_nodes is None:
