@@ -4,7 +4,7 @@ import networkx as nx
 from scipy.sparse import coo_matrix, kron, find
 from pyformlang.finite_automaton import EpsilonNFA, State
 
-from project import finite_automatons
+from project.finite_automatons import get_nfa_from_graph, get_min_dfa_from_regex
 
 
 class BooleanDecomposition:
@@ -39,6 +39,22 @@ class BooleanDecomposition:
             if not nonzero_self == nonzero2_other:
                 return False
         return True
+
+    def transitive_closure(self) -> coo_matrix:
+        """
+        Calculate transitive closure from symbols matrices
+        :return: transitive closure adjacency matrix
+        """
+        adj_matrix = sum(
+            self.to_dict().values(), coo_matrix((len(self.states), len(self.states)))
+        )
+
+        nnz_values = 0
+        while nnz_values != adj_matrix.nnz:
+            nnz_values = adj_matrix.nnz
+            adj_matrix += adj_matrix @ adj_matrix
+
+        return adj_matrix
 
 
 def boolean_decomposition_from_enfa(enfa: EpsilonNFA) -> BooleanDecomposition:
@@ -152,8 +168,8 @@ def intersect_enfa(enfa_lhs: EpsilonNFA, enfa_rhs: EpsilonNFA) -> EpsilonNFA:
 def regular_path_query(
     regex_str: str,
     graph: nx.MultiDiGraph,
-    start_states: list = None,
-    final_states: list = None,
+    start_states: set = None,
+    final_states: set = None,
 ) -> set:
     """
     Perform a rpq in a given graph with regex
@@ -163,14 +179,26 @@ def regular_path_query(
     :param final_states: final states of rpq in a given graph
     :return: set of tuples which satisfies given rpq. First elements are start states and second are final states
     """
-    min_dfa = finite_automatons.get_min_dfa_from_regex(regex_str)
-    intersect = intersect_enfa(
-        finite_automatons.get_nfa_from_graph(graph, start_states, final_states), min_dfa
-    )
-    result = set()
-    net = intersect.to_networkx()
-    for start in intersect.start_states:
-        for final in intersect.final_states:
-            if nx.has_path(net, source=start, target=final) and start != final:
-                result.add((start.value[0], final.value[0]))
-    return result
+    if start_states is None:
+        start_states = list(graph.nodes)
+
+    if final_states is None:
+        final_states = list(graph.nodes)
+
+    enfa_graph = get_nfa_from_graph(graph, start_states, final_states)
+    enfa_regex = get_min_dfa_from_regex(regex_str)
+    intersection = intersect_enfa(enfa_graph, enfa_regex)
+    bd_intersection = boolean_decomposition_from_enfa(intersection)
+    results = set()
+    for (i, j) in zip(*bd_intersection.transitive_closure().nonzero()):
+        (graph_start_state, regex_start_state) = bd_intersection.states[i].value
+        (graph_final_state, regex_final_state) = bd_intersection.states[j].value
+        if (
+            graph_start_state in start_states
+            and graph_final_state in final_states
+            and regex_start_state in enfa_regex.start_states
+            and regex_final_state in enfa_regex.final_states
+        ):
+            results.add((graph_start_state, graph_final_state))
+
+    return results
