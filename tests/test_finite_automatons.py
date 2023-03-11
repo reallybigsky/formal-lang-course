@@ -1,7 +1,6 @@
 from pyformlang.regular_expression import Regex
 from pyformlang.finite_automaton import DeterministicFiniteAutomaton
-from project import finite_automatons
-from project import graphs
+from project import graphs, finite_automatons
 from regexs_data import sources
 
 
