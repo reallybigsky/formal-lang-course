@@ -3,7 +3,7 @@ from pyformlang.finite_automaton import DeterministicFiniteAutomaton, EpsilonNFA
 import networkx as nx
 
 
-def get_min_dfa_from_regex(expr: str) -> DeterministicFiniteAutomaton:
+def regex_to_min_dfa(expr: str) -> DeterministicFiniteAutomaton:
     """
     Builds minimal Deterministic Finite Automaton (DFA) from given regular expression
 
@@ -14,7 +14,7 @@ def get_min_dfa_from_regex(expr: str) -> DeterministicFiniteAutomaton:
     return regex.to_epsilon_nfa().minimize()
 
 
-def get_nfa_from_graph(
+def graph_to_nfa(
     graph: nx.MultiDiGraph, start_nodes: set = None, final_nodes: set = None
 ) -> EpsilonNFA:
     """
