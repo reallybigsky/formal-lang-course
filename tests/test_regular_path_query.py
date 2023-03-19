@@ -3,13 +3,12 @@ import numpy as np
 from typing import List
 from scipy.sparse import coo_matrix
 
-from pyformlang.finite_automaton import State, Symbol
-
 from tests.test_utils import create_automata, create_graph
 from project.regular_path_queries import intersect_enfa, regular_path_query
 from project.regular_path_queries import (
     kron_boolean_decomposition as kron_bd,
     BooleanDecomposition as bd,
+    bfs_regular_path_query,
 )
 
 
@@ -17,53 +16,50 @@ def test_kron_boolean_decomposition():
     bd_res = kron_bd(
         bd(
             {
-                Symbol("a"): coo_matrix(
+                "a": coo_matrix(
                     (np.array([1]), (np.array([0]), np.array([0]))), shape=(1, 1)
                 )
             },
-            [State(0)],
+            [0],
         ),
         bd(
             {
-                Symbol("a"): coo_matrix(
+                "a": coo_matrix(
                     (np.array([1]), (np.array([0]), np.array([0]))), shape=(1, 1)
                 )
             },
-            [State(0)],
+            [0],
         ),
     )
     bd_exp = bd(
         {
-            Symbol("a"): coo_matrix(
+            "a": coo_matrix(
                 (np.array([1]), (np.array([0]), np.array([0]))), shape=(1, 1)
             )
         },
-        [State((State(0), State(0)))],
+        [(0, 0)],
     )
     assert bd_res == bd_exp
 
     bd_res = kron_bd(
         bd(
             {
-                Symbol("a"): coo_matrix(
+                "a": coo_matrix(
                     (np.array([1]), (np.array([0]), np.array([0]))), shape=(1, 1)
                 )
             },
-            [State(0)],
+            [0],
         ),
         bd(
             {
-                Symbol("b"): coo_matrix(
+                "b": coo_matrix(
                     (np.array([1]), (np.array([0]), np.array([0]))), shape=(1, 1)
                 )
             },
-            [State(0)],
+            [0],
         ),
     )
-    bd_exp = bd(
-        {Symbol("a"): coo_matrix((1, 1)), Symbol("b"): coo_matrix((1, 1))},
-        [State((State(0), State(0)))],
-    )
+    bd_exp = bd({"a": coo_matrix((1, 1)), "b": coo_matrix((1, 1))}, [(0, 0)])
 
     assert bd_res == bd_exp
 
@@ -122,22 +118,73 @@ def test_intersect_enfa():
 def test_regular_path_query():
     assert regular_path_query(
         "a*", create_graph(nodes=[0, 1], edges=[(0, "a", 1)])
-    ) == {(State(0), State(1))}
+    ) == {(0, 1)}
 
     assert regular_path_query(
         "a.b", create_graph(nodes=[0, 1, 2], edges=[(0, "a", 1), (1, "b", 2)])
-    ) == {(State(0), State(2))}
+    ) == {(0, 2)}
 
     assert regular_path_query(
         "a*", create_graph(nodes=[0, 1, 2], edges=[(0, "a", 1), (1, "a", 2)])
-    ) == {(State(0), State(1)), (State(1), State(2)), (State(0), State(2))}
+    ) == {(0, 1), (1, 2), (0, 2)}
 
     assert regular_path_query(
         "(a.b)|c",
         create_graph(nodes=[0, 1, 2], edges=[(0, "c", 0), (0, "a", 1), (1, "b", 2)]),
-    ) == {(State(0), State(2)), (State(0), State(0))}
+    ) == {(0, 2), (0, 0)}
 
     assert regular_path_query(
         "c*.a.b",
         create_graph(nodes=[0, 1, 2], edges=[(0, "c", 0), (0, "a", 1), (1, "b", 2)]),
-    ) == {(State(0), State(2))}
+    ) == {(0, 2)}
+
+
+def test_bfs_regular_path_query():
+    assert bfs_regular_path_query(
+        "a*", create_graph(nodes=[0, 1], edges=[(0, "a", 1)]), True, [0]
+    ) == {(0, 1)}
+    assert bfs_regular_path_query(
+        "a.b",
+        create_graph(nodes=[0, 1, 2], edges=[(0, "a", 1), (1, "b", 2)]),
+        True,
+        [0],
+    ) == {(0, 2)}
+    assert bfs_regular_path_query(
+        "(a.b)|c",
+        create_graph(nodes=[0, 1, 2], edges=[(0, "c", 1), (0, "a", 1), (1, "b", 2)]),
+        True,
+        [0],
+    ) == {(0, 2), (0, 1)}
+    assert bfs_regular_path_query(
+        "c*.a.b",
+        create_graph(nodes=[0, 1, 2], edges=[(0, "c", 0), (0, "a", 1), (1, "b", 2)]),
+        True,
+        [0],
+    ) == {(0, 2)}
+    assert bfs_regular_path_query(
+        "a*", create_graph(nodes=[0, 1], edges=[(0, "a", 1)]), False, [0]
+    ) == {1}
+    assert bfs_regular_path_query(
+        "a.b",
+        create_graph(nodes=[0, 1, 2], edges=[(0, "a", 1), (1, "b", 2)]),
+        False,
+        [0],
+    ) == {2}
+    assert bfs_regular_path_query(
+        "a*",
+        create_graph(nodes=[0, 1, 2], edges=[(0, "a", 1), (1, "a", 2)]),
+        False,
+        [0, 1],
+    ) == {2}
+    assert bfs_regular_path_query(
+        "(a.b)|c",
+        create_graph(nodes=[0, 1, 2], edges=[(0, "c", 1), (0, "a", 1), (1, "b", 2)]),
+        False,
+        [0],
+    ) == {2, 1}
+    assert bfs_regular_path_query(
+        "c*.a.b",
+        create_graph(nodes=[0, 1, 2], edges=[(0, "c", 0), (0, "a", 1), (1, "b", 2)]),
+        False,
+        [0],
+    ) == {2}

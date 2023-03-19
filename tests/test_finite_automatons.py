@@ -4,8 +4,8 @@ from project import graphs, finite_automatons
 from regexs_data import sources
 
 
-def test_get_min_dfa_from_regex():
-    mdfa = finite_automatons.get_min_dfa_from_regex("e*((13)|(37)).boi")
+def test_regex_to_min_dfa():
+    mdfa = finite_automatons.regex_to_min_dfa("e*((13)|(37)).boi")
     dfa = DeterministicFiniteAutomaton()
     dfa.add_start_state(0)
     dfa.add_final_state(2)
@@ -17,9 +17,9 @@ def test_get_min_dfa_from_regex():
     assert mdfa.is_equivalent_to(dfa)
 
 
-def test_get_min_dfa_from_regex_on_complex_data():
+def test_regex_to_min_dfa_on_complex_data():
     def helper_test_on_regexs_data(rx: str, source_name: str):
-        dfa = finite_automatons.get_min_dfa_from_regex(rx)
+        dfa = finite_automatons.regex_to_min_dfa(rx)
         regex = Regex(rx)
 
         for word in sources[source_name]["good"]:
@@ -38,10 +38,10 @@ def test_get_min_dfa_from_regex_on_complex_data():
     helper_test_on_regexs_data(combo, "combo_test")
 
 
-def test_get_nfa_from_graph():
+def test_graph_to_nfa():
     def helper_test_fa_on_cfpq_data(name: str):
         graph = graphs.get_nx_graph_by_name(name)
-        nfa = finite_automatons.get_nfa_from_graph(graph)
+        nfa = finite_automatons.graph_to_nfa(graph)
 
         assert graph.number_of_nodes() == len(nfa.start_states)
         assert graph.number_of_nodes() == len(nfa.final_states)
@@ -53,8 +53,8 @@ def test_get_nfa_from_graph():
 
     def helper_two_cycles_graph():
         tsg = graphs.create_two_cycles_graph(3, 6, ["a", "b"])
-        nfa = finite_automatons.get_nfa_from_graph(tsg, {0}, {0})
-        dfa = finite_automatons.get_min_dfa_from_regex("(a a a a|b b b b b b b)*")
+        nfa = finite_automatons.graph_to_nfa(tsg, {0}, {0})
+        dfa = finite_automatons.regex_to_min_dfa("(a a a a|b b b b b b b)*")
 
         assert dfa.is_equivalent_to(nfa)
 
