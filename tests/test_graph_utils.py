@@ -22,6 +22,6 @@ def test_create_and_save_two_cycles_graph_as_pydot():
     )
     assert filecmp.cmp(
         "tmp_two_cycles_graph_42_29",
-        "./tests/test_graph_utils_two_cycles_graph_42_29_expected",
+        "./tests/data/test_graph_utils_two_cycles_graph_42_29_expected",
     )
     os.remove("tmp_two_cycles_graph_42_29")
