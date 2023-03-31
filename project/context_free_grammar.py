@@ -18,8 +18,11 @@ def cfg_to_weak_cnf(cfg: CFG) -> CFG:
     :param cfg: context free grammar
     :return: weak Chomsky normal form
     """
-    cfg_no_unit_prods = (cfg.eliminate_unit_productions().remove_useless_symbols())
+    cfg_no_unit_prods = cfg.eliminate_unit_productions().remove_useless_symbols()
     new_prods = cfg_no_unit_prods._get_productions_with_only_single_terminals()
     new_prods = cfg_no_unit_prods._decompose_productions(new_prods)
-    result = CFG(start_symbol=cfg_no_unit_prods.start_symbol, productions=set(new_prods),)
+    result = CFG(
+        start_symbol=cfg_no_unit_prods.start_symbol,
+        productions=set(new_prods),
+    )
     return result

@@ -12,7 +12,9 @@ def test_cfg_to_weak_cnf():
                 elif len(production.body) == 1:
                     assert isinstance(production.body[0], Terminal)
                 elif len(production.body) == 2:
-                    assert isinstance(production.body[0], Variable) and isinstance(production.body[1], Variable)
+                    assert isinstance(production.body[0], Variable) and isinstance(
+                        production.body[1], Variable
+                    )
                 else:
                     assert False
         except AssertionError:
@@ -33,9 +35,9 @@ def test_cfg_to_weak_cnf():
 
         assert is_cfg_in_weak_cnf(weak_cnf_cfg) and expected_words == actual_words
 
-    check_cfg_in_weak_cnf('./data/cfg_decompose.txt')
-    check_cfg_in_weak_cnf('./data/cfg_epsilon.txt')
-    check_cfg_in_weak_cnf('./data/cfg_general_test.txt')
-    check_cfg_in_weak_cnf('./data/cfg_terminals_to_variables.txt')
-    check_cfg_in_weak_cnf('./data/cfg_unit_production.txt')
-    check_cfg_in_weak_cnf('./data/cfg_useless_variables.txt')
+    check_cfg_in_weak_cnf("./data/cfg_decompose.txt")
+    check_cfg_in_weak_cnf("./data/cfg_epsilon.txt")
+    check_cfg_in_weak_cnf("./data/cfg_general_test.txt")
+    check_cfg_in_weak_cnf("./data/cfg_terminals_to_variables.txt")
+    check_cfg_in_weak_cnf("./data/cfg_unit_production.txt")
+    check_cfg_in_weak_cnf("./data/cfg_useless_variables.txt")
