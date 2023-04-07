@@ -29,9 +29,9 @@ def test_recursive_automata():
                 Variable("S"): Regex("A.B.C").to_epsilon_nfa(),
                 Variable("A"): Regex("a").to_epsilon_nfa(),
                 Variable("B"): Regex("b").to_epsilon_nfa(),
-                Variable("C"): Regex("c").to_epsilon_nfa()
-            }
-        )
+                Variable("C"): Regex("c").to_epsilon_nfa(),
+            },
+        ),
     )
 
     check_automata_eq(
@@ -49,9 +49,9 @@ def test_recursive_automata():
             {
                 Variable("S"): Regex("a.b.c.D").to_epsilon_nfa(),
                 Variable("D"): Regex("E").to_epsilon_nfa(),
-                Variable("E"): Regex("d").to_epsilon_nfa()
-            }
-        )
+                Variable("E"): Regex("d").to_epsilon_nfa(),
+            },
+        ),
     )
 
     check_automata_eq(
@@ -71,9 +71,9 @@ def test_recursive_automata():
                 Variable("S"): Regex("A.B").to_epsilon_nfa(),
                 Variable("A"): Regex("a").to_epsilon_nfa(),
                 Variable("B"): Regex("C").to_epsilon_nfa(),
-                Variable("C"): Regex("c").to_epsilon_nfa()
-            }
-        )
+                Variable("C"): Regex("c").to_epsilon_nfa(),
+            },
+        ),
     )
 
     check_automata_eq(
@@ -91,9 +91,9 @@ def test_recursive_automata():
             {
                 Variable("S"): Regex("A").to_epsilon_nfa(),
                 Variable("A"): Regex("a").to_epsilon_nfa(),
-                Variable("B"): Regex("b").to_epsilon_nfa()
-            }
-        )
+                Variable("B"): Regex("b").to_epsilon_nfa(),
+            },
+        ),
     )
 
     check_automata_eq(
@@ -105,11 +105,8 @@ def test_recursive_automata():
             )
         ),
         RecursiveAutomata(
-            Variable("S"),
-            {
-                Variable("S"): Regex("a.b").to_epsilon_nfa()
-            }
-        )
+            Variable("S"), {Variable("S"): Regex("a.b").to_epsilon_nfa()}
+        ),
     )
 
     check_automata_eq(
@@ -121,9 +118,6 @@ def test_recursive_automata():
             )
         ),
         RecursiveAutomata(
-            Variable("S"),
-            {
-                Variable("S"): Regex("(a.b)|(S.S)|$").to_epsilon_nfa()
-            }
-        )
+            Variable("S"), {Variable("S"): Regex("(a.b)|(S.S)|$").to_epsilon_nfa()}
+        ),
     )

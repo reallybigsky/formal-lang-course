@@ -15,7 +15,9 @@ class RecursiveAutomata:
         """
         Get minimized recursive automata
         """
-        return RecursiveAutomata(self.start, {v: nfa.minimize() for v, nfa in self.var_to_auto.items()})
+        return RecursiveAutomata(
+            self.start, {v: nfa.minimize() for v, nfa in self.var_to_auto.items()}
+        )
 
     def to_boolean_dcmps(self):
         """
@@ -34,4 +36,7 @@ class RecursiveAutomata:
         :param ecfg: ecfg
         :return: recursive automata
         """
-        return RecursiveAutomata(ecfg.start, {v: regex.to_epsilon_nfa() for v, regex in ecfg.productions.items()})
+        return RecursiveAutomata(
+            ecfg.start,
+            {v: regex.to_epsilon_nfa() for v, regex in ecfg.productions.items()},
+        )

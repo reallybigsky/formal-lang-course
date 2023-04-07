@@ -17,7 +17,11 @@ def test_ecfg_from_pyformlang_cfg():
 
         assert set(actual.productions.keys()) == set(expected.productions.keys())
         for k in actual.productions.keys():
-            assert (actual.productions[k].to_epsilon_nfa().is_equivalent_to(expected.productions[k].to_epsilon_nfa()))
+            assert (
+                actual.productions[k]
+                .to_epsilon_nfa()
+                .is_equivalent_to(expected.productions[k].to_epsilon_nfa())
+            )
         assert actual.start == expected.start
 
     check_ecfg_eq(
@@ -26,17 +30,16 @@ def test_ecfg_from_pyformlang_cfg():
             A -> a
             B -> b
             C -> c
-        """
-        ,
+        """,
         ECFG(
             Variable("S"),
             {
                 Variable("S"): Regex("A.B.C"),
                 Variable("A"): Regex("a"),
                 Variable("B"): Regex("b"),
-                Variable("C"): Regex("c")
-            }
-        )
+                Variable("C"): Regex("c"),
+            },
+        ),
     )
 
     check_ecfg_eq(
@@ -44,16 +47,15 @@ def test_ecfg_from_pyformlang_cfg():
             S -> a b c D
             D -> E
             E -> d
-        """
-        ,
+        """,
         ECFG(
             Variable("S"),
             {
                 Variable("S"): Regex("a.b.c.D"),
                 Variable("D"): Regex("E"),
-                Variable("E"): Regex("d")
-            }
-        )
+                Variable("E"): Regex("d"),
+            },
+        ),
     )
 
     check_ecfg_eq(
@@ -62,17 +64,16 @@ def test_ecfg_from_pyformlang_cfg():
             A -> a
             B -> C
             C -> c
-        """
-        ,
+        """,
         ECFG(
             Variable("S"),
             {
                 Variable("S"): Regex("A.B"),
                 Variable("A"): Regex("a"),
                 Variable("B"): Regex("C"),
-                Variable("C"): Regex("c")
-            }
-        )
+                Variable("C"): Regex("c"),
+            },
+        ),
     )
 
     check_ecfg_eq(
@@ -80,40 +81,27 @@ def test_ecfg_from_pyformlang_cfg():
             S -> A
             A -> a
             B -> b
-        """
-        ,
+        """,
         ECFG(
             Variable("S"),
             {
                 Variable("S"): Regex("A"),
                 Variable("A"): Regex("a"),
-                Variable("B"): Regex("b")
-            }
-        )
+                Variable("B"): Regex("b"),
+            },
+        ),
     )
 
     check_ecfg_eq(
         """
             S -> a b
-        """
-        ,
-        ECFG(
-            Variable("S"),
-            {
-                Variable("S"): Regex("a.b")
-            }
-        )
+        """,
+        ECFG(Variable("S"), {Variable("S"): Regex("a.b")}),
     )
 
     check_ecfg_eq(
         """
             S -> S S | a b | $
-        """
-        ,
-        ECFG(
-            Variable("S"),
-            {
-                Variable("S"): Regex("(S.S)|(a.b)|$")
-            }
-        )
+        """,
+        ECFG(Variable("S"), {Variable("S"): Regex("(S.S)|(a.b)|$")}),
     )

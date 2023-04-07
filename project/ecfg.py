@@ -7,6 +7,7 @@ class ECFG:
     """
     Extended context free grammar
     """
+
     def __init__(self, start: Variable, productions: Dict[Variable, Regex]):
         self.start = start
         self.productions = productions
@@ -19,7 +20,11 @@ class ECFG:
         start = cfg.start_symbol
         productions = dict()
         for prod in cfg.productions:
-            body = Regex(".".join(symbol.value for symbol in prod.body) if len(prod.body) > 0 else "$")
+            body = Regex(
+                ".".join(symbol.value for symbol in prod.body)
+                if len(prod.body) > 0
+                else "$"
+            )
             if prod.head not in productions:
                 productions[prod.head] = body
             else:
