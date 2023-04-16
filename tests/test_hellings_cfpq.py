@@ -13,40 +13,40 @@ def test_context_free_path_query():
 
     check_cfpq(
         """
-                S -> A B
-                A -> a
-                B -> b
-            """,
+            S -> A B
+            A -> a
+            B -> b
+        """,
         create_graph(nodes=[0, 1, 2], edges=[(0, "a", 1), (1, "b", 2)]),
         {(0, 2)},
     )
 
     check_cfpq(
         """
-                S -> $
-            """,
+            S -> $
+        """,
         create_graph(nodes=[0, 1], edges=[(0, "a", 1), (1, "b", 0)]),
         {(0, 0), (1, 1)},
     )
 
     check_cfpq(
         """
-                S -> A B C
-                A -> a
-                B -> b
-                C -> c
-            """,
+            S -> A B C
+            A -> a
+            B -> b
+            C -> c
+        """,
         create_graph(nodes=[0, 1, 2, 3], edges=[(0, "a", 1), (1, "b", 2), (2, "c", 3)]),
         {(0, 3)},
     )
 
     check_cfpq(
         """
-                S -> A B C | S S | s
-                A -> a
-                B -> b
-                C -> c
-            """,
+            S -> A B C | S S | s
+            A -> a
+            B -> b
+            C -> c
+        """,
         create_graph(
             nodes=[0, 1, 2, 3],
             edges=[(0, "s", 0), (0, "a", 1), (1, "b", 2), (2, "c", 3)],
@@ -56,10 +56,10 @@ def test_context_free_path_query():
 
     check_cfpq(
         """
-                S -> A B | S S
-                A -> a | $
-                B -> b
-            """,
+            S -> A B | S S
+            A -> a | $
+            B -> b
+        """,
         create_graph(
             nodes=[0, 1, 2, 3, 4],
             edges=[(0, "a", 1), (1, "b", 2), (2, "a", 3), (3, "b", 4)],

@@ -1,19 +1,27 @@
 import collections
 from typing import Set, Tuple, List
 
+import cfpq_data
 from pyformlang.cfg import CFG, Terminal, Variable
 from networkx import MultiDiGraph
 
 
-def import_cfg_from_file(path: str) -> CFG:
+def import_cfg_from_text(text: str) -> CFG:
+    """
+    Load context free grammar from text
+    :param text
+    :return: CFG from text
+    """
+    return cfpq_data.cfg_from_text(text)
+
+
+def import_cfg_from_txt(path: str) -> CFG:
     """
     Load context free grammar from file
     :param path: filepath with CFG
     :return: CFG from file
     """
-    with open(path) as f:
-        content = f.readlines()
-        return CFG.from_text("\n".join(content))
+    return cfpq_data.cfg_from_txt(path)
 
 
 def cfg_to_weak_cnf(cfg: CFG) -> CFG:
