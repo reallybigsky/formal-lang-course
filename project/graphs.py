@@ -19,6 +19,18 @@ class GraphInfo:
         return list([label for _, _, label in self.labels])
 
 
+def import_graph_from_text(text: str) -> nx.MultiDiGraph:
+    return cfpq.graph_from_text(text)
+
+
+def import_graph_from_txt(path: str) -> nx.MultiDiGraph:
+    return cfpq.graph_from_txt(path)
+
+
+def import_graph_from_csv(path: str) -> nx.MultiDiGraph:
+    return cfpq.graph_from_csv(path)
+
+
 def get_nx_graph_by_name(name: str) -> nx.MultiDiGraph:
     graph_path = cfpq.download(name)
     graph = cfpq.graph_from_csv(graph_path)

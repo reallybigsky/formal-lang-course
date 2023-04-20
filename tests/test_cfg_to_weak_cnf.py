@@ -1,6 +1,6 @@
 from functools import reduce
 from pyformlang.cfg import CFG, Terminal, Variable
-from project.context_free_grammar import import_cfg_from_file, cfg_to_weak_cnf
+from project.context_free_grammar import import_cfg_from_txt, cfg_to_weak_cnf
 
 
 def test_cfg_to_weak_cnf():
@@ -23,7 +23,7 @@ def test_cfg_to_weak_cnf():
         return True
 
     def check_cfg_in_weak_cnf(path: str, max_word_len=10):
-        cfg = import_cfg_from_file(path)
+        cfg = import_cfg_from_txt(path)
         weak_cnf_cfg = cfg_to_weak_cnf(cfg)
 
         expected_words = set()
