@@ -2,14 +2,20 @@ from typing import Set
 
 from pyformlang.cfg import CFG
 from networkx import MultiDiGraph
-from project.context_free_grammar import context_free_path_query
+from project.context_free_grammar import context_free_path_query, CfpqClosureType
 from tests.test_utils import create_graph
 
 
 def test_context_free_path_query():
     def check_cfpq(txt: str, graph: MultiDiGraph, expected: Set):
-        actual = context_free_path_query(cfg=CFG.from_text(txt), graph=graph)
-        assert actual == expected
+        actual_hellings = context_free_path_query(
+            cfg=CFG.from_text(txt), graph=graph, closure_type=CfpqClosureType.HELLINGS
+        )
+        actual_matrix = context_free_path_query(
+            cfg=CFG.from_text(txt), graph=graph, closure_type=CfpqClosureType.MATRIX
+        )
+        assert actual_hellings == expected
+        assert actual_matrix == expected
 
     check_cfpq(
         """
