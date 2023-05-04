@@ -7,11 +7,11 @@ prog = List<stmt>
 stmt =
     Bind of string * expr
   | Print of expr
-  
+
 val =
     String  of string
   | Int     of int
-  
+
 expr =
     Var of string                // переменные
   | Const of val                 // константы
@@ -36,18 +36,18 @@ expr =
   | Star of expr                 // замыкание языков (звезда Клини)
   | List of List<expr>           // множество элементов
   | Logic of logic               // логическое выражение
-  
+
 logic =
     In  of string * expr         // проверка, лежит ли переменная (задаваемая как имя) в множестве значений expr
   | And of logic * logic         // логическое "и"
   | Or  of logic * logic         // логическое "или"
   | Not of logic                 // логическое "не"
-  
+
 args =
     Wildcard of string                      // аргумент любого вида
   | Edge     of args * string * args        // аргумент ребро, содержащее две вершины и метку
   | List     of List<args>                  // аргумент, являющийся списком элементов
-  
+
 lambda =
     Lambda of args * expr        // лямбда как функция с аргументами и выражением
 ```
@@ -107,7 +107,7 @@ args:
 
 lambda_expr:
     LAMBDA L_BRACKET args R_BRACKET OF expr FO ;
-    
+
 SEMICOLON: ';' ;
 COMMA : ',' ;
 
