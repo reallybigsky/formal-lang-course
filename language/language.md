@@ -4,6 +4,7 @@
 
 ```
 prog = List<stmt>
+
 stmt =
     Bind of string * expr
   | Print of expr
@@ -55,7 +56,7 @@ lambda =
 ### Конкретный синтаксис
 
 ```
-grammar lang ;
+grammar lang;
 
 prog: (((print_stmt | bind) SEMICOLON) | comment)* ;
 
