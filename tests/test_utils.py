@@ -57,18 +57,7 @@ def deep_compare(a_graph: pydot.Dot, b_graph: pydot.Dot) -> bool:
             return False
 
         neighbours_a = get_neighbors(edges_a)
-        # for e_a in filter(lambda e: e.get_source() == a.get_name(), edges_a):
-        #     nodes = a_graph.get_node(e_a.get_destination())
-        #     if len(nodes) != 1:
-        #         return False
-        #     neighbours_a.append(nodes[0])
-
         neighbours_b = get_neighbors(edges_b)
-        # for e_b in filter(lambda e: e.get_source() == b.get_name(), edges_b):
-        #     nodes = b_graph.get_node(e_b.get_destination())
-        #     if len(nodes) != 1:
-        #         return False
-        #     neighbours_b.append(nodes[0])
 
         if len(neighbours_a) != len(neighbours_b):
             return False

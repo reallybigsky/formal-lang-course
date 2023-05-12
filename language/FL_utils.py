@@ -33,7 +33,7 @@ class FLProgConverter(ParseTreeListener):
         walker.walk(converter, parser.prog())
         return converter._dot
 
-    def visit_terminal(self, node: TerminalNode):
+    def visitTerminal(self, node: TerminalNode):
         label = str(node).strip('"')
         label = f'"{label}"'
         new_node = pydot.Node(self._id, label=label)
@@ -41,7 +41,7 @@ class FLProgConverter(ParseTreeListener):
         self._try_connect_with_parent(new_node)
         self._id += 1
 
-    def enter_every_rule(self, ctx: ParserRuleContext):
+    def enterEveryRule(self, ctx: ParserRuleContext):
         new_node = pydot.Node(
             self._id, label=f"Rule[{FLParser.ruleNames[ctx.getRuleIndex()]}]"
         )
@@ -50,7 +50,7 @@ class FLProgConverter(ParseTreeListener):
         self._stack.append(new_node)
         self._id += 1
 
-    def exit_every_rule(self, ctx: ParserRuleContext):
+    def exitEveryRule(self, ctx: ParserRuleContext):
         self._stack.pop()
 
     def _try_connect_with_parent(self, new_node):
