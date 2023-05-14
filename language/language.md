@@ -1,9 +1,16 @@
 # Описание языка запросов
 
+### Генерация файлов antlr
+
+```shell
+antlr4 FL.g4 -Dlanguage=Python3 -o dist
+```
+
 ### Абстрактный синтаксис
 
 ```
 prog = List<stmt>
+
 stmt =
     Bind of string * expr
   | Print of expr
@@ -55,7 +62,7 @@ lambda =
 ### Конкретный синтаксис
 
 ```
-grammar lang ;
+grammar lang;
 
 prog: (((print_stmt | bind) SEMICOLON) | comment)* ;
 
