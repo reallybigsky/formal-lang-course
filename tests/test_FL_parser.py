@@ -166,7 +166,7 @@ testdata = [
         ),
     ),
     (
-        "l := (lambda {} -> \"test\");",
+        'l := (lambda {} -> "test");',
         dot_from_string(
             """
             digraph "FL program" {
