@@ -31,7 +31,7 @@ jobs:
           python -m pip list
 
       - name: ANTLR gen
-        working-directory: language/
+        working-directory: project/language/
         run: antlr4 FL.g4 -Dlanguage=Python3 -o dist
 
       - name: Run tests

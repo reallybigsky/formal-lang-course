@@ -9,8 +9,8 @@ from antlr4 import (
     ParserRuleContext,
 )
 
-from language.dist.FLLexer import FLLexer
-from language.dist.FLParser import FLParser
+from project.language.dist.FLLexer import FLLexer
+from project.language.dist.FLParser import FLParser
 
 
 def get_parser(prog: str) -> FLParser:
@@ -30,7 +30,7 @@ class FLProgConverter(ParseTreeListener):
         converter = FLProgConverter()
         parser = get_parser(prog)
         walker = ParseTreeWalker()
-        walker.walk(converter, parser.prog())
+        walker.walk(converter, parser.program())
         return converter._dot
 
     def visitTerminal(self, node: TerminalNode):
@@ -62,7 +62,7 @@ class FLProgConverter(ParseTreeListener):
 def is_FL_prog(prog: str) -> bool:
     parser = get_parser(prog)
     parser.removeErrorListeners()
-    parser.prog()
+    parser.program()
     return parser.getNumberOfSyntaxErrors() == 0
 
 

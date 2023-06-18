@@ -1,26 +1,16 @@
 import pydot
 
-from language.FL_utils import FL_prog_to_dot
+from project.language.FL_utils import FL_prog_to_dot
 from test_utils import deep_compare, dot_from_string
 
 
 testdata = [
     (
-        "/* simple comment */",
+        "// simple comment \n",
         dot_from_string(
             """
             digraph "FL program" {
-                1 [label="Rule[prog]"];
-                2 [label="Rule[comment]"];
-                1 -> 2;
-                3 [label="/*"];
-                2 -> 3;
-                4 [label="simple"];
-                2 -> 4;
-                5 [label="comment"];
-                2 -> 5;
-                6 [label="*/"];
-                2 -> 6;
+                1 [label="Rule[program]"];
             }
         """
         ),
@@ -30,43 +20,53 @@ testdata = [
         dot_from_string(
             """
             digraph "FL program" {
-                1 [label="Rule[prog]"];
-                2 [label="Rule[print_stmt]"];
+                1 [label="Rule[program]"];
+                2 [label="Rule[stmt]"];
                 1 -> 2;
-                3 [label="print"];
+                3 [label="Rule[print]"];
                 2 -> 3;
-                4 [label="Rule[expr]"];
-                2 -> 4;
-                5 [label="Rule[const]"];
-                4 -> 5;
-                6 [label="1"];
+                4 [label="print"];
+                3 -> 4;
+                5 [label="Rule[expr]"];
+                3 -> 5;
+                6 [label="Rule[val]"];
                 5 -> 6;
-                7 [label=";"];
-                1 -> 7;
+                7 [label="Rule[integer]"];
+                6 -> 7;
+                8 [label="1"];
+                7 -> 8;
+                9 [label=";"];
+                1 -> 9;
             }
         """
         ),
     ),
     (
-        "number := 1;",
+        "n := 1;",
         dot_from_string(
             """
             digraph "FL program" {
-                1 [label="Rule[prog]"];
-                2 [label="Rule[bind]"];
+                1 [label="Rule[program]"];
+                2 [label="Rule[stmt]"];
                 1 -> 2;
-                3 [label="number"];
+                3 [label="Rule[bind]"];
                 2 -> 3;
-                4 [label=":="];
-                2 -> 4;
-                5 [label="Rule[expr]"];
-                2 -> 5;
-                6 [label="Rule[const]"];
-                5 -> 6;
-                7 [label="1"];
-                6 -> 7;
-                8 [label=";"];
-                1 -> 8;
+                4 [label="Rule[var]"];
+                3 -> 4;
+                5 [label="n"];
+                4 -> 5;
+                6 [label=":="];
+                3 -> 6;
+                7 [label="Rule[expr]"];
+                3 -> 7;
+                8 [label="Rule[val]"];
+                7 -> 8;
+                9 [label="Rule[integer]"];
+                8 -> 9;
+                10 [label="1"];
+                9 -> 10;
+                11 [label=";"];
+                1 -> 11;
             }
         """
         ),
@@ -76,175 +76,89 @@ testdata = [
         dot_from_string(
             """
             digraph "FL program" {
-                1 [label="Rule[prog]"];
-                2 [label="Rule[bind]"];
+                1 [label="Rule[program]"];
+                2 [label="Rule[stmt]"];
                 1 -> 2;
-                3 [label="string"];
+                3 [label="Rule[bind]"];
                 2 -> 3;
-                4 [label=":="];
-                2 -> 4;
-                5 [label="Rule[expr]"];
-                2 -> 5;
-                6 [label="Rule[const]"];
-                5 -> 6;
-                7 [label="str"];
-                6 -> 7;
-                8 [label=";"];
-                1 -> 8;
+                4 [label="Rule[var]"];
+                3 -> 4;
+                5 [label="string"];
+                4 -> 5;
+                6 [label=":="];
+                3 -> 6;
+                7 [label="Rule[expr]"];
+                3 -> 7;
+                8 [label="Rule[val]"];
+                7 -> 8;
+                9 [label="Rule[string]"];
+                8 -> 9;
+                10 [label="str"];
+                9 -> 10;
+                11 [label=";"];
+                1 -> 11;
             }
         """
         ),
     ),
     (
-        "l := lambda (a) of a fo;",
+        "l := (lambda {s} -> s . s);",
         dot_from_string(
             """
             digraph "FL program" {
-                1 [label="Rule[prog]"];
-                2 [label="Rule[bind]"];
+                1 [label="Rule[program]"];
+                2 [label="Rule[stmt]"];
                 1 -> 2;
-                3 [label="l"];
+                3 [label="Rule[bind]"];
                 2 -> 3;
-                4 [label=":="];
-                2 -> 4;
-                5 [label="Rule[expr]"];
-                2 -> 5;
-                6 [label="Rule[lambda_expr]"];
-                5 -> 6;
-                7 [label="lambda"];
-                6 -> 7;
-                8 [label="("];
-                6 -> 8;
-                9 [label="Rule[args]"];
-                6 -> 9;
-                10 [label="a"];
-                9 -> 10;
-                11 [label=")"];
-                6 -> 11;
-                12 [label="of"];
-                6 -> 12;
-                13 [label="Rule[expr]"];
-                6 -> 13;
-                14 [label="a"];
-                13 -> 14;
-                15 [label="fo"];
-                6 -> 15;
-                16 [label=";"];
-                1 -> 16;
-            }
-        """
-        ),
-    ),
-    (
-        "l := lambda ([a, b]) of a fo;",
-        dot_from_string(
-            """
-            digraph "FL program" {
-                1 [label="Rule[prog]"];
-                2 [label="Rule[bind]"];
-                1 -> 2;
-                3 [label="l"];
-                2 -> 3;
-                4 [label=":="];
-                2 -> 4;
-                5 [label="Rule[expr]"];
-                2 -> 5;
-                6 [label="Rule[lambda_expr]"];
-                5 -> 6;
-                7 [label="lambda"];
-                6 -> 7;
-                8 [label="("];
-                6 -> 8;
-                9 [label="Rule[args]"];
-                6 -> 9;
-                10 [label="["];
-                9 -> 10;
-                11 [label="Rule[args]"];
-                9 -> 11;
-                12 [label="a"];
+                4 [label="Rule[var]"];
+                3 -> 4;
+                5 [label="l"];
+                4 -> 5;
+                6 [label=":="];
+                3 -> 6;
+                7 [label="Rule[expr]"];
+                3 -> 7;
+                8 [label="Rule[lambda]"];
+                7 -> 8;
+                9 [label="("];
+                8 -> 9;
+                10 [label="lambda"];
+                8 -> 10;
+                11 [label="Rule[list]"];
+                8 -> 11;
+                12 [label="{"];
                 11 -> 12;
-                13 [label=","];
-                9 -> 13;
-                14 [label="Rule[args]"];
-                9 -> 14;
-                15 [label="b"];
-                14 -> 15;
-                16 [label="]"];
-                9 -> 16;
-                17 [label=")"];
-                6 -> 17;
-                18 [label="of"];
-                6 -> 18;
-                19 [label="Rule[expr]"];
-                6 -> 19;
-                20 [label="a"];
-                19 -> 20;
-                21 [label="fo"];
-                6 -> 21;
-                22 [label=";"];
-                1 -> 22;
-            }
-        """
-        ),
-    ),
-    (
-        "nodes := set_start (graph, [0, 1, 2]);",
-        dot_from_string(
-            """
-            digraph "FL program" {
-                1 [label="Rule[prog]"];
-                2 [label="Rule[bind]"];
-                1 -> 2;
-                3 [label="nodes"];
-                2 -> 3;
-                4 [label=":="];
-                2 -> 4;
-                5 [label="Rule[expr]"];
-                2 -> 5;
-                6 [label="Rule[two_args_builtin]"];
-                5 -> 6;
-                7 [label="set_start"];
-                6 -> 7;
-                8 [label="("];
-                5 -> 8;
-                9 [label="Rule[expr]"];
-                5 -> 9;
-                10 [label="graph"];
-                9 -> 10;
-                11 [label=","];
-                5 -> 11;
-                12 [label="Rule[expr]"];
-                5 -> 12;
-                13 [label="Rule[list_expr]"];
-                12 -> 13;
-                14 [label="["];
+                13 [label="Rule[item]"];
+                11 -> 13;
+                14 [label="Rule[var]"];
                 13 -> 14;
-                15 [label="Rule[expr]"];
-                13 -> 15;
-                16 [label="Rule[const]"];
-                15 -> 16;
-                17 [label="0"];
-                16 -> 17;
-                18 [label=","];
-                13 -> 18;
-                19 [label="Rule[expr]"];
-                13 -> 19;
-                20 [label="Rule[const]"];
+                15 [label="s"];
+                14 -> 15;
+                16 [label="}"];
+                11 -> 16;
+                17 [label="->"];
+                8 -> 17;
+                18 [label="Rule[expr]"];
+                8 -> 18;
+                19 [label="Rule[concat]"];
+                18 -> 19;
+                20 [label="Rule[bin_arg_l]"];
                 19 -> 20;
-                21 [label="1"];
+                21 [label="Rule[var]"];
                 20 -> 21;
-                22 [label=","];
-                13 -> 22;
-                23 [label="Rule[expr]"];
-                13 -> 23;
-                24 [label="Rule[const]"];
-                23 -> 24;
-                25 [label="2"];
+                22 [label="s"];
+                21 -> 22;
+                23 [label="."];
+                19 -> 23;
+                24 [label="Rule[bin_arg_r]"];
+                19 -> 24;
+                25 [label="Rule[var]"];
                 24 -> 25;
-                26 [label="]"];
-                13 -> 26;
+                26 [label="s"];
+                25 -> 26;
                 27 [label=")"];
-                5 -> 27;
+                8 -> 27;
                 28 [label=";"];
                 1 -> 28;
             }
@@ -252,153 +166,263 @@ testdata = [
         ),
     ),
     (
-        "nodes := get_start (graph);",
+        "l := (lambda {} -> \"test\");",
         dot_from_string(
             """
             digraph "FL program" {
-                1 [label="Rule[prog]"];
-                2 [label="Rule[bind]"];
+                1 [label="Rule[program]"];
+                2 [label="Rule[stmt]"];
                 1 -> 2;
-                3 [label="nodes"];
+                3 [label="Rule[bind]"];
                 2 -> 3;
-                4 [label=":="];
-                2 -> 4;
-                5 [label="Rule[expr]"];
-                2 -> 5;
-                6 [label="Rule[one_args_builtin]"];
-                5 -> 6;
-                7 [label="get_start"];
-                6 -> 7;
-                8 [label="("];
-                5 -> 8;
-                9 [label="Rule[expr]"];
-                5 -> 9;
-                10 [label="graph"];
-                9 -> 10;
-                11 [label=")"];
-                5 -> 11;
-                12 [label=";"];
-                1 -> 12;
-            }
-        """
-        ),
-    ),
-    (
-        "nodes := filter nodes with lambda (a) of a in graph fo;",
-        dot_from_string(
-            """
-            digraph "FL program" {
-                1 [label="Rule[prog]"];
-                2 [label="Rule[bind]"];
-                1 -> 2;
-                3 [label="nodes"];
-                2 -> 3;
-                4 [label=":="];
-                2 -> 4;
-                5 [label="Rule[expr]"];
-                2 -> 5;
-                6 [label="Rule[with_builtin]"];
-                5 -> 6;
-                7 [label="filter"];
-                6 -> 7;
-                8 [label="Rule[expr]"];
-                5 -> 8;
-                9 [label="nodes"];
+                4 [label="Rule[var]"];
+                3 -> 4;
+                5 [label="l"];
+                4 -> 5;
+                6 [label=":="];
+                3 -> 6;
+                7 [label="Rule[expr]"];
+                3 -> 7;
+                8 [label="Rule[lambda]"];
+                7 -> 8;
+                9 [label="("];
                 8 -> 9;
-                10 [label="with"];
-                5 -> 10;
-                11 [label="Rule[expr]"];
-                5 -> 11;
-                12 [label="Rule[lambda_expr]"];
+                10 [label="lambda"];
+                8 -> 10;
+                11 [label="Rule[list]"];
+                8 -> 11;
+                12 [label="{"];
                 11 -> 12;
-                13 [label="lambda"];
-                12 -> 13;
-                14 [label="("];
-                12 -> 14;
-                15 [label="Rule[args]"];
-                12 -> 15;
-                16 [label="a"];
+                13 [label="}"];
+                11 -> 13;
+                14 [label="->"];
+                8 -> 14;
+                15 [label="Rule[expr]"];
+                8 -> 15;
+                16 [label="Rule[val]"];
                 15 -> 16;
-                17 [label=")"];
-                12 -> 17;
-                18 [label="of"];
-                12 -> 18;
-                19 [label="Rule[expr]"];
-                12 -> 19;
-                20 [label="Rule[logic]"];
-                19 -> 20;
-                21 [label="Rule[logic_atom]"];
-                20 -> 21;
-                22 [label="a"];
-                21 -> 22;
-                23 [label="in"];
-                21 -> 23;
-                24 [label="Rule[expr]"];
-                21 -> 24;
-                25 [label="graph"];
-                24 -> 25;
-                26 [label="fo"];
-                12 -> 26;
-                27 [label=";"];
-                1 -> 27;
+                17 [label="Rule[string]"];
+                16 -> 17;
+                18 [label="test"];
+                17 -> 18;
+                19 [label=")"];
+                8 -> 19;
+                20 [label=";"];
+                1 -> 20;
             }
         """
         ),
     ),
     (
-        'reg := regex "a*";',
+        "nodes := set_start of graph to {1, 2, 3};",
         dot_from_string(
             """
             digraph "FL program" {
-                1 [label="Rule[prog]"];
-                2 [label="Rule[bind]"];
+                1 [label="Rule[program]"];
+                2 [label="Rule[stmt]"];
                 1 -> 2;
-                3 [label="reg"];
+                3 [label="Rule[bind]"];
                 2 -> 3;
-                4 [label=":="];
-                2 -> 4;
-                5 [label="Rule[expr]"];
-                2 -> 5;
-                6 [label="Rule[string_arg_builtin]"];
-                5 -> 6;
-                7 [label="regex"];
-                6 -> 7;
-                8 [label="a*"];
-                5 -> 8;
-                9 [label=";"];
-                1 -> 9;
-            }
-        """
-        ),
-    ),
-    (
-        "lang := intersect a and b;",
-        dot_from_string(
-            """
-            digraph "FL program" {
-                1 [label="Rule[prog]"];
-                2 [label="Rule[bind]"];
-                1 -> 2;
-                3 [label="lang"];
-                2 -> 3;
-                4 [label=":="];
-                2 -> 4;
-                5 [label="Rule[expr]"];
-                2 -> 5;
-                6 [label="Rule[two_args_language_builtin]"];
-                5 -> 6;
-                7 [label="intersect"];
-                6 -> 7;
-                8 [label="Rule[expr]"];
-                5 -> 8;
-                9 [label="a"];
+                4 [label="Rule[var]"];
+                3 -> 4;
+                5 [label="nodes"];
+                4 -> 5;
+                6 [label=":="];
+                3 -> 6;
+                7 [label="Rule[expr]"];
+                3 -> 7;
+                8 [label="Rule[set_start]"];
+                7 -> 8;
+                9 [label="set_start"];
                 8 -> 9;
-                10 [label="and"];
-                5 -> 10;
-                11 [label="Rule[expr]"];
-                5 -> 11;
-                12 [label="b"];
+                10 [label="of"];
+                8 -> 10;
+                11 [label="Rule[source]"];
+                8 -> 11;
+                12 [label="Rule[var]"];
                 11 -> 12;
+                13 [label="graph"];
+                12 -> 13;
+                14 [label="to"];
+                8 -> 14;
+                15 [label="Rule[target]"];
+                8 -> 15;
+                16 [label="Rule[list]"];
+                15 -> 16;
+                17 [label="{"];
+                16 -> 17;
+                18 [label="Rule[item]"];
+                16 -> 18;
+                19 [label="Rule[integer]"];
+                18 -> 19;
+                20 [label="1"];
+                19 -> 20;
+                21 [label=","];
+                16 -> 21;
+                22 [label="Rule[item]"];
+                16 -> 22;
+                23 [label="Rule[integer]"];
+                22 -> 23;
+                24 [label="2"];
+                23 -> 24;
+                25 [label=","];
+                16 -> 25;
+                26 [label="Rule[item]"];
+                16 -> 26;
+                27 [label="Rule[integer]"];
+                26 -> 27;
+                28 [label="3"];
+                27 -> 28;
+                29 [label="}"];
+                16 -> 29;
+                30 [label=";"];
+                1 -> 30;
+            }
+        """
+        ),
+    ),
+    (
+        "nodes := get_start of graph;",
+        dot_from_string(
+            """
+            digraph "FL program" {
+                1 [label="Rule[program]"];
+                2 [label="Rule[stmt]"];
+                1 -> 2;
+                3 [label="Rule[bind]"];
+                2 -> 3;
+                4 [label="Rule[var]"];
+                3 -> 4;
+                5 [label="nodes"];
+                4 -> 5;
+                6 [label=":="];
+                3 -> 6;
+                7 [label="Rule[expr]"];
+                3 -> 7;
+                8 [label="Rule[get_start]"];
+                7 -> 8;
+                9 [label="get_start"];
+                8 -> 9;
+                10 [label="of"];
+                8 -> 10;
+                11 [label="Rule[target]"];
+                8 -> 11;
+                12 [label="Rule[var]"];
+                11 -> 12;
+                13 [label="graph"];
+                12 -> 13;
+                14 [label=";"];
+                1 -> 14;
+            }
+        """
+        ),
+    ),
+    (
+        "nodes := filter (lambda {a} -> a == 1) : graph;",
+        dot_from_string(
+            """
+            digraph "FL program" {
+                1 [label="Rule[program]"];
+                2 [label="Rule[stmt]"];
+                1 -> 2;
+                3 [label="Rule[bind]"];
+                2 -> 3;
+                4 [label="Rule[var]"];
+                3 -> 4;
+                5 [label="nodes"];
+                4 -> 5;
+                6 [label=":="];
+                3 -> 6;
+                7 [label="Rule[expr]"];
+                3 -> 7;
+                8 [label="Rule[filter]"];
+                7 -> 8;
+                9 [label="filter"];
+                8 -> 9;
+                10 [label="Rule[lambda]"];
+                8 -> 10;
+                11 [label="("];
+                10 -> 11;
+                12 [label="lambda"];
+                10 -> 12;
+                13 [label="Rule[list]"];
+                10 -> 13;
+                14 [label="{"];
+                13 -> 14;
+                15 [label="Rule[item]"];
+                13 -> 15;
+                16 [label="Rule[var]"];
+                15 -> 16;
+                17 [label="a"];
+                16 -> 17;
+                18 [label="}"];
+                13 -> 18;
+                19 [label="->"];
+                10 -> 19;
+                20 [label="Rule[expr]"];
+                10 -> 20;
+                21 [label="Rule[equal]"];
+                20 -> 21;
+                22 [label="Rule[bin_eq_arg_l]"];
+                21 -> 22;
+                23 [label="Rule[var]"];
+                22 -> 23;
+                24 [label="a"];
+                23 -> 24;
+                25 [label="=="];
+                21 -> 25;
+                26 [label="Rule[bin_eq_arg_r]"];
+                21 -> 26;
+                27 [label="Rule[val]"];
+                26 -> 27;
+                28 [label="Rule[integer]"];
+                27 -> 28;
+                29 [label="1"];
+                28 -> 29;
+                30 [label=")"];
+                10 -> 30;
+                31 [label=":"];
+                8 -> 31;
+                32 [label="Rule[iterable]"];
+                8 -> 32;
+                33 [label="Rule[var]"];
+                32 -> 33;
+                34 [label="graph"];
+                33 -> 34;
+                35 [label=";"];
+                1 -> 35;
+            }
+        """
+        ),
+    ),
+    (
+        'reg := "regex"*;',
+        dot_from_string(
+            """
+            digraph "FL program" {
+                1 [label="Rule[program]"];
+                2 [label="Rule[stmt]"];
+                1 -> 2;
+                3 [label="Rule[bind]"];
+                2 -> 3;
+                4 [label="Rule[var]"];
+                3 -> 4;
+                5 [label="reg"];
+                4 -> 5;
+                6 [label=":="];
+                3 -> 6;
+                7 [label="Rule[expr]"];
+                3 -> 7;
+                8 [label="Rule[kleene]"];
+                7 -> 8;
+                9 [label="Rule[bin_arg_l]"];
+                8 -> 9;
+                10 [label="Rule[string]"];
+                9 -> 10;
+                11 [label="regex"];
+                10 -> 11;
+                12 [label="*"];
+                8 -> 12;
                 13 [label=";"];
                 1 -> 13;
             }
@@ -406,39 +430,39 @@ testdata = [
         ),
     ),
     (
-        "lang := [1, 2];",
+        "lang := a & b;",
         dot_from_string(
             """
             digraph "FL program" {
-                1 [label="Rule[prog]"];
-                2 [label="Rule[bind]"];
+                1 [label="Rule[program]"];
+                2 [label="Rule[stmt]"];
                 1 -> 2;
-                3 [label="lang"];
+                3 [label="Rule[bind]"];
                 2 -> 3;
-                4 [label=":="];
-                2 -> 4;
-                5 [label="Rule[expr]"];
-                2 -> 5;
-                6 [label="Rule[list_expr]"];
-                5 -> 6;
-                7 [label="["];
-                6 -> 7;
-                8 [label="Rule[expr]"];
-                6 -> 8;
-                9 [label="Rule[const]"];
+                4 [label="Rule[var]"];
+                3 -> 4;
+                5 [label="lang"];
+                4 -> 5;
+                6 [label=":="];
+                3 -> 6;
+                7 [label="Rule[expr]"];
+                3 -> 7;
+                8 [label="Rule[intersect]"];
+                7 -> 8;
+                9 [label="Rule[bin_arg_l]"];
                 8 -> 9;
-                10 [label="1"];
+                10 [label="Rule[var]"];
                 9 -> 10;
-                11 [label=","];
-                6 -> 11;
-                12 [label="Rule[expr]"];
-                6 -> 12;
-                13 [label="Rule[const]"];
-                12 -> 13;
-                14 [label="2"];
+                11 [label="a"];
+                10 -> 11;
+                12 [label="&"];
+                8 -> 12;
+                13 [label="Rule[bin_arg_r]"];
+                8 -> 13;
+                14 [label="Rule[var]"];
                 13 -> 14;
-                15 [label="]"];
-                6 -> 15;
+                15 [label="b"];
+                14 -> 15;
                 16 [label=";"];
                 1 -> 16;
             }
@@ -450,75 +474,37 @@ testdata = [
         dot_from_string(
             """
             digraph "FL program" {
-                1 [label="Rule[prog]"];
-                2 [label="Rule[bind]"];
+                1 [label="Rule[program]"];
+                2 [label="Rule[stmt]"];
                 1 -> 2;
-                3 [label="logic"];
+                3 [label="Rule[bind]"];
                 2 -> 3;
-                4 [label=":="];
-                2 -> 4;
-                5 [label="Rule[expr]"];
-                2 -> 5;
-                6 [label="Rule[logic]"];
-                5 -> 6;
-                7 [label="Rule[logic_atom]"];
-                6 -> 7;
-                8 [label="a"];
+                4 [label="Rule[var]"];
+                3 -> 4;
+                5 [label="logic"];
+                4 -> 5;
+                6 [label=":="];
+                3 -> 6;
+                7 [label="Rule[expr]"];
+                3 -> 7;
+                8 [label="Rule[in]"];
                 7 -> 8;
-                9 [label="in"];
-                7 -> 9;
-                10 [label="Rule[expr]"];
-                7 -> 10;
-                11 [label="graph"];
+                9 [label="Rule[bin_in_arg_l]"];
+                8 -> 9;
+                10 [label="Rule[var]"];
+                9 -> 10;
+                11 [label="a"];
                 10 -> 11;
-                12 [label=";"];
-                1 -> 12;
-            }
-        """
-        ),
-    ),
-    (
-        "logic := a in graph and b in graph;",
-        dot_from_string(
-            """
-            digraph "FL program" {
-                1 [label="Rule[prog]"];
-                2 [label="Rule[bind]"];
-                1 -> 2;
-                3 [label="logic"];
-                2 -> 3;
-                4 [label=":="];
-                2 -> 4;
-                5 [label="Rule[expr]"];
-                2 -> 5;
-                6 [label="Rule[logic]"];
-                5 -> 6;
-                7 [label="Rule[logic_atom]"];
-                6 -> 7;
-                8 [label="a"];
-                7 -> 8;
-                9 [label="in"];
-                7 -> 9;
-                10 [label="Rule[expr]"];
-                7 -> 10;
-                11 [label="graph"];
-                10 -> 11;
-                12 [label="and"];
-                6 -> 12;
-                13 [label="Rule[logic]"];
-                6 -> 13;
-                14 [label="Rule[logic_atom]"];
+                12 [label="in"];
+                8 -> 12;
+                13 [label="Rule[bin_in_arg_r]"];
+                8 -> 13;
+                14 [label="Rule[var]"];
                 13 -> 14;
-                15 [label="b"];
+                15 [label="graph"];
                 14 -> 15;
-                16 [label="in"];
-                14 -> 16;
-                17 [label="Rule[expr]"];
-                14 -> 17;
-                18 [label="graph"];
-                17 -> 18;
-                19 [label=";"];
-                1 -> 19;
+                16 [label=";"];
+                1 -> 16;
             }
         """
         ),
