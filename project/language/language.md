@@ -62,108 +62,112 @@ lambda =
 ### Конкретный синтаксис
 
 ```
-grammar lang;
+grammar FL;
 
-prog: (((print_stmt | bind) SEMICOLON) | comment)* ;
+program: (stmt SEMICOLON)*;
 
-comment: '/*' .*? '*/' ;
+stmt: print | bind;
 
-print_stmt: PRINT expr ;
-bind: IDENT ASSIGN expr ;
+print: PRINT value=expr;
+bind: id=IDENT ASSIGN value=expr;
 
-const: STRING | DECIMAL ;
+val:
+    value=STRING # val_string
+  | value=INT    # val_int
+  | set          # val_list
+  | value=IDENT  # val_id
+  ;
 
-list_expr: LSQ_BRACKET (expr (COMMA expr)*)? RSQ_BRACKET ;
-
-two_args_builtin: SET_START | SET_FINAL | ADD_START | ADD_FINAL ;
-one_args_builtin: GET_START | GET_FINAL | GET_REACHABLE | GET_VERTICES | GET_EDGES | GET_LABELS ;
-
-with_builtin: MAP | FILTER ;
-
-string_args_builtin: LOAD | REGEX | CFG ;
-
-two_args_lang_builtin: INTERSECT | CONCAT | UNION ;
-one_args_lang_builtin: KLEENE_CLOSURE ;
+bool: TRUE | FALSE;
+vertex: INT;
+edge: LP INT COMMA STRING COMMA INT RP;
+graph: LP set COMMA set RP;
+set: LB RB | LB items+=expr (COMMA items+=expr)* RB;
+lambda: LAMBDA LP val RP ARROW LB body=expr RB;
 
 expr:
-    const
-  | lambda_expr
-  | two_args_builtin L_BRACKET expr COMMA expr R_BRACKET
-  | one_args_builtin L_BRACKET expr R_BRACKET
-  | with_builtin expr WITH expr
-  | string_args_builtin STRING
-  | two_args_lang_builtin expr AND expr
-  | one_args_lang_builtin expr
-  | list_expr
-  | logic
-  | L_BRACKET expr R_BRACKET
-  | IDENT;
+    LP expr RP # expr_expr
+  | name=IDENT # expr_var
+  | val        # expr_val
+  | lambda     # expr_lambda
+  | GET_EDGES value=expr                     # expr_get_edge
+  | GET_LABELS value=expr                    # expr_get_labels
+  | GET_VERTICES value=expr                  # expr_get_vertices
+  | GET_REACHABLE value=expr                 # expr_get_reachable
+  | GET_START value=expr                     # expr_get_start
+  | GET_FINAL value=expr                     # expr_get_final
+  | SET_START LP to=expr COMMA start=expr RP # expr_set_start
+  | SET_FINAL LP to=expr COMMA final=expr RP # expr_set_final
+  | ADD_START LP to=expr COMMA start=expr RP # expr_add_start
+  | ADD_FINAL LP to=expr COMMA final=expr RP # expr_add_final
+  | MAP LP lambda COMMA expr RP              # expr_map
+  | FILTER LP lambda COMMA expr RP           # expr_filter
+  | LOAD value=STRING                        # expr_load
+  | left=expr INTERSECT right=expr           # expr_intersect
+  | left=expr CONCAT right=expr              # expr_concat
+  | left=expr IN right=expr                  # expr_in
+  | left=expr EQUAL right=expr               # expr_equal
+  | left=expr NOT_EQUAL right=expr           # expr_not_equal
+  ;
 
-logic_atom: IDENT IN expr ;
+COMMA: ',';
+ASSIGN: ':=';
+ARROW: '->';
+SEMICOLON: ';';
 
-logic:
-    logic_atom
-  | logic_atom AND logic
-  | logic_atom OR logic
-  | NOT logic
-  | L_BRACKET logic R_BRACKET ;
+CONCAT: '||';
+INTERSECT: '&&';
+EQUAL: '==';
+NOT_EQUAL: '!=';
+IN: 'in';
 
-args:
-    IDENT
-  | LSQ_BRACKET (args (COMMA args)*)? RSQ_BRACKET ;
+PRINT: 'print';
 
-lambda_expr:
-    LAMBDA L_BRACKET args R_BRACKET OF expr FO ;
+LAMBDA: 'lambda';
+MAP: 'map';
+FILTER: 'filter';
+LOAD: 'load';
 
-SEMICOLON: ';' ;
-COMMA : ',' ;
+GET_EDGES: 'get_edges';
+GET_LABELS: 'get_labels';
+GET_VERTICES: 'get_vertices';
+GET_REACHABLE: 'get_reachable';
 
-PRINT: 'print' ;
-STRING: '"' .*? '"' ;
-DECIMAL: [0-9]+ ;
-ASSIGN: ':=' ;
+GET_FINAL: 'get_final';
+GET_START: 'get_start';
+ADD_FINAL: 'add_final';
+ADD_START: 'add_start';
+SET_FINAL: 'set_final';
+SET_START: 'set_start';
 
-KLEENE_CLOSURE : 'kleene' ;
-UNION : 'union' ;
-CONCAT : 'concat' ;
-INTERSECT : 'intersect' ;
+LP: '(';
+RP: ')';
+LB: '{';
+RB: '}';
 
-CFG : 'cfg' ;
-REGEX : 'regex' ;
-LOAD : 'load' ;
+TRUE: 'true';
+FALSE: 'false';
+INT: [1-9][0-9]* | '0';
+STRING: '"' (~["\\] | '\\' .)* '"';
+IDENT: CHAR (CHAR | DIGIT)*;
+CHAR: [a-zA-Z_];
+DIGIT: [0-9];
 
-FILTER : 'filter' ;
-MAP : 'map' ;
-GET_LABELS : 'gel_labels' ;
-GET_EDGES : 'get_edges' ;
-GET_VERTICES : 'get_vertices' ;
-GET_REACHABLE : 'get_reachable' ;
-GET_FINAL : 'get_final' ;
-GET_START : 'get_start' ;
-ADD_FINAL : 'add_final' ;
-ADD_START : 'add_start' ;
-SET_FINAL : 'set_final' ;
-SET_START : 'set_start' ;
-
-L_BRACKET : '(' ;
-R_BRACKET : ')' ;
-LSQ_BRACKET : '[' ;
-RSQ_BRACKET : ']' ;
-
-AND : 'and' ;
-OR : 'or' ;
-NOT : 'not' ;
-IN : 'in' ;
-
-LAMBDA : 'lambda' ;
-
-OF : 'of' ;
-FO : 'fo' ;
-WITH : 'with' ;
-
-IDENT: [_a-zA-Z0-9]+ ;
-WS : [\n\r\t\f]+ -> skip ;
+COMMENT: '//' ~[\n]* -> skip;
+WS: [ \t\n\r\f]+ -> channel(HIDDEN);
 ```
+### Система типов
+
+| Тип    | Описание                             |
+|--------|--------------------------------------|
+| Int    | Целое число                          |
+| String | Строка (в т.ч. регулярное выражение) |
+| Bool   | Логическое значение                  |
+| Vertex | Вершина графа                        |
+| Edge   | Ребро графа                          |
+| Graph  | Граф                                 |
+| List   | Список                               |
+| Lambda | Лямбда функция                       | 
 
 ### Примеры
 
@@ -177,7 +181,7 @@ graph           := set_start (load "pizza", [0]);
 reachable_pairs := get_reachable (graph);
 
 /* Получаем из пар достижимых вершин вторую компоненту */
-reachable_list  := map reachable_pairs with lambda ([a, b]) of b fo;
+reachable_list  := map (lambda ({a, b}) -> {b}, get_reachable (graph));
 print reachable_list;
 ```
 
@@ -185,22 +189,20 @@ print reachable_list;
 
 ```
 /* Загружаем граф и устанавливаем ему стартовое множество вершин */
-graph                               := set_start (load "pizza", [0, 1, 2]);
-regular_expr                        := regex "subClassOf*";
+graph                               := set_start (load "pizza", {0, 1, 2});
+regular_expr                        := "subClassOf*";
 
 /* Пересекаем граф и regex, получаем новый конечный автомат */
-graph_and_regular_expr_intersection := intersect graph and regular_expr;
+graph_and_regular_expr_intersection := graph && regular_expr;
 
 /* Получаем пары вершин достижимых в получившемся автомате - пересечении regex и графа */
-reachable_pairs_intersection        := get_reachable (graph_and_regular_expr_intersection);
+reachable_pairs_intersection        := get_reachable graph_and_regular_expr_intersection;
 
 /* Оставляем только те пары достижимых вершин в пересечении, которые понадобятся для ответа */
-reachable_pairs_from_start_set      := filter reachable_pairs_intersection with
-                                            lambda ([[graph_s, regex_s], [graph_f, regex_f]]) of
-                                                graph_s in get_start (graph) and regex_s in get_start (regular_expr)
-                                                and regex_f in get_final (regular_expr)
-                                            fo;
+reachable_pairs_from_start_set      := filter (lambda ({{graph_s, regex_s}, {graph_f, regex_f}}) ->
+                                                 {graph_s in get_start graph && regex_s in get_start regular_expr
+                                                && regex_f in get_final regular_expr}, reachable_pairs_interssection);
 
 /* Печатаем результат */
-print map reachable_pairs_from_start_set with lambda ([[graph_s, regex_s], [graph_f, regex_f]]) of graph_f fo
+print map (lambda ({{graph_s, regex_s}, {graph_f, regex_f}}) -> {graph_f}, reachable_pairs_from_start_set);
 ```

@@ -4,92 +4,58 @@ program: (stmt SEMICOLON)*;
 
 stmt: print | bind;
 
-print: PRINT expr;
-bind: var ASSIGN expr;
+print: PRINT value=expr;
+bind: id=IDENT ASSIGN value=expr;
 
-var: IDENT;
-integer: DIGIT+;
-string: STRING;
-edge: LP integer COMMA string COMMA integer RP;
-item: var | string | integer | edge | list;
-list: LB RB | LB item (COMMA item)* RB;
-graph: LP list COMMA list RP;
-iterable: list | var;
-val: integer | string | list | edge | graph;
+val:
+    value=STRING # val_string
+  | value=INT    # val_int
+  | set          # val_list
+  | value=IDENT  # val_id
+  ;
 
-target: var | integer | list;
-source: var | graph;
-
-normalize: NORMALIZE target;
-get_start: GET_START OF target;
-get_final: GET_FINAL OF target;
-set_start: SET_START OF source TO target;
-set_final: SET_FINAL OF source TO target;
-add_start: ADD_START OF source TO target;
-add_final: ADD_FINAL OF source TO target;
-
-get_edges: GET_EDGES OF target;
-get_labels: GET_LABELS OF target;
-get_vertices: GET_VERTICES OF target;
-get_reachable: GET_REACHABLE OF target;
-
-lambda: LP LAMBDA list ARROW expr RP;
-map: MAP (lambda | var) COLON iterable;
-filter: FILTER (lambda | var) COLON iterable;
-load: LOAD (string | var);
-
-bin_arg_l: var | string | graph;
-bin_arg_r: var | string | graph;
-bin_eq_arg_l: var | val;
-bin_eq_arg_r: var | val;
-bin_in_arg_l: var | integer | string | edge;
-bin_in_arg_r: var | string | graph;
-
-union: bin_arg_l UNION bin_arg_r;
-intersect: bin_arg_l INTERSECT bin_arg_r;
-equal: bin_eq_arg_l EQUAL bin_eq_arg_r;
-in: bin_in_arg_l IN bin_in_arg_r;
-concat: bin_arg_l CONCAT bin_arg_r;
-kleene: bin_arg_l KLEENE;
+bool: TRUE | FALSE;
+vertex: INT;
+edge: LP INT COMMA STRING COMMA INT RP;
+graph: LP set COMMA set RP;
+set: LB RB | LB items+=expr (COMMA items+=expr)* RB;
+lambda: LAMBDA LP val RP ARROW LB body=expr RB;
 
 expr:
-    LP expr RP
-  | val
-  | var
-  | normalize
-  | get_start
-  | get_final
-  | set_start
-  | set_final
-  | add_start
-  | add_final
-  | get_edges
-  | get_labels
-  | get_vertices
-  | get_reachable
-  | lambda
-  | map
-  | filter
-  | load
-  | union
-  | intersect
-  | equal
-  | in
-  | concat
-  | kleene
+    LP expr RP # expr_expr
+  | name=IDENT # expr_var
+  | val        # expr_val
+  | lambda     # expr_lambda
+  | GET_EDGES value=expr                     # expr_get_edge
+  | GET_LABELS value=expr                    # expr_get_labels
+  | GET_VERTICES value=expr                  # expr_get_vertices
+  | GET_REACHABLE value=expr                 # expr_get_reachable
+  | GET_START value=expr                     # expr_get_start
+  | GET_FINAL value=expr                     # expr_get_final
+  | SET_START LP to=expr COMMA start=expr RP # expr_set_start
+  | SET_FINAL LP to=expr COMMA final=expr RP # expr_set_final
+  | ADD_START LP to=expr COMMA start=expr RP # expr_add_start
+  | ADD_FINAL LP to=expr COMMA final=expr RP # expr_add_final
+  | MAP LP lambda COMMA expr RP              # expr_map
+  | FILTER LP lambda COMMA expr RP           # expr_filter
+  | LOAD value=STRING                        # expr_load
+  | left=expr INTERSECT right=expr           # expr_intersect
+  | left=expr CONCAT right=expr              # expr_concat
+  | left=expr IN right=expr                  # expr_in
+  | left=expr EQUAL right=expr               # expr_equal
+  | left=expr NOT_EQUAL right=expr           # expr_not_equal
   ;
 
 COMMA: ',';
-COLON: ':';
 ASSIGN: ':=';
 ARROW: '->';
 SEMICOLON: ';';
 
-UNION: '|';
-INTERSECT: '&';
+CONCAT: '||';
+INTERSECT: '&&';
 EQUAL: '==';
-CONCAT: '.';
-KLEENE: '*';
+NOT_EQUAL: '!=';
+IN: 'in';
 
 PRINT: 'print';
 
@@ -98,9 +64,8 @@ MAP: 'map';
 FILTER: 'filter';
 LOAD: 'load';
 
-NORMALIZE: 'normalize';
 GET_EDGES: 'get_edges';
-GET_LABELS: 'gel_labels';
+GET_LABELS: 'get_labels';
 GET_VERTICES: 'get_vertices';
 GET_REACHABLE: 'get_reachable';
 
@@ -116,14 +81,13 @@ RP: ')';
 LB: '{';
 RB: '}';
 
-OF: 'of';
-TO: 'to';
-IN: 'in';
-
+TRUE: 'true';
+FALSE: 'false';
+INT: [1-9][0-9]* | '0';
+STRING: '"' (~["\\] | '\\' .)* '"';
 IDENT: CHAR (CHAR | DIGIT)*;
 CHAR: [a-zA-Z_];
 DIGIT: [0-9];
-STRING: '"' (~["\\] | '\\' .)* '"';
 
 COMMENT: '//' ~[\n]* -> skip;
 WS: [ \t\n\r\f]+ -> channel(HIDDEN);
