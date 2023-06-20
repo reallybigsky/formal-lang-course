@@ -32,7 +32,7 @@ jobs:
 
       - name: ANTLR gen
         working-directory: project/language/
-        run: antlr4 FL.g4 -Dlanguage=Python3 -o dist
+        run: antlr4 FL.g4 -Dlanguage=Python3 -visitor -o dist
 
       - name: Run tests
         run: python ./scripts/run_tests.py

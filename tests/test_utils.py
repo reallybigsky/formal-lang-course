@@ -1,12 +1,21 @@
+import io
 import pydot
 
 from typing import List
 from pyformlang.finite_automaton import EpsilonNFA
 from networkx import MultiDiGraph
+from project.language.interpreter import interpret
+
+
+def interpret_to_str(*args, **kwargs):
+    with io.StringIO() as output:
+        kwargs["out"] = output
+        interpret(*args, **kwargs)
+        return output.getvalue()
 
 
 def create_automata(
-    transitions: List[tuple], start_states: List, final_states: List
+        transitions: List[tuple], start_states: List, final_states: List
 ) -> EpsilonNFA:
     automaton = EpsilonNFA()
     automaton.add_transitions(transitions)
