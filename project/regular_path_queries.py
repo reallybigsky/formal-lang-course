@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Iterable
 from copy import copy
 
 import numpy as np
@@ -14,9 +14,8 @@ from scipy.sparse import (
     vstack,
     identity,
 )
-from pyformlang.finite_automaton import EpsilonNFA, State
-
-from project.finite_automatons import graph_to_nfa, regex_to_min_dfa
+from pyformlang.finite_automaton import EpsilonNFA, State, Symbol
+from project.finite_automaton import graph_to_nfa, regex_to_min_dfa
 
 
 class BooleanDecomposition:
@@ -260,6 +259,48 @@ def kron_boolean_decomposition(
             intersect_states.append(State((s_lhs, s_rhs)))
 
     return BooleanDecomposition(intersect_dcmps, intersect_states)
+
+
+def nfa_iterator(nfa: EpsilonNFA) -> Iterable[tuple[State, Symbol, State]]:
+    """
+    Get edge:[State, Symbol, State] iterator from EpsilonNFA
+    """
+    for u, t in nfa.to_dict().items():
+        for s, vs in t.items():
+            try:
+                for v in vs:
+                    yield u, s, v
+            except TypeError:
+                yield u, s, vs
+
+
+def concat(lhs: EpsilonNFA, rhs: EpsilonNFA) -> EpsilonNFA:
+    """
+    Concatenate two NFAs into single NFA
+    """
+    lhs_states = {st: 3 + i for i, st in enumerate(lhs.states)}
+    rhs_states = {st: 3 + len(lhs.states) + i for i, st in enumerate(rhs.states)}
+    s, st, t = 0, 1, 2
+
+    result = EpsilonNFA(
+        states=set({s, t} | lhs_states.keys() | rhs_states.keys()),
+        input_symbols=set(lhs.symbols | rhs.symbols),
+        start_state={s},
+        final_states={t},
+    )
+
+    result.add_transitions(
+        [(lhs_states[u], l, lhs_states[v]) for u, l, v in nfa_iterator(lhs)]
+    )
+    result.add_transitions(
+        [(rhs_states[u], l, rhs_states[v]) for u, l, v in nfa_iterator(rhs)]
+    )
+    result.add_transitions([(s, "epsilon", lhs_states[x]) for x in lhs.start_states])
+    result.add_transitions([(lhs_states[x], "epsilon", st) for x in lhs.final_states])
+    result.add_transitions([(st, "epsilon", rhs_states[x]) for x in rhs.start_states])
+    result.add_transitions([(rhs_states[x], "epsilon", t) for x in rhs.final_states])
+
+    return result
 
 
 def intersect_enfa(enfa_lhs: EpsilonNFA, enfa_rhs: EpsilonNFA) -> EpsilonNFA:
