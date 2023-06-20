@@ -15,7 +15,7 @@ def interpret_to_str(*args, **kwargs):
 
 
 def create_automata(
-        transitions: List[tuple], start_states: List, final_states: List
+    transitions: List[tuple], start_states: List, final_states: List
 ) -> EpsilonNFA:
     automaton = EpsilonNFA()
     automaton.add_transitions(transitions)

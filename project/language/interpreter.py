@@ -49,54 +49,80 @@ class InterpretVisitor(FLVisitor):
             return holder
         elif holder.value_type is FLValueType.StringValue:
             casted_value = regex_to_min_dfa(holder.value)
-            result = FLValueHolder(value=casted_value, ctx=ctx, value_type=FLValueType.FiniteAutomataValue)
+            result = FLValueHolder(
+                value=casted_value, ctx=ctx, value_type=FLValueType.FiniteAutomataValue
+            )
             return result
         else:
-            raise InterpretError("Can not get NFA from " + str(holder.value_type) + " type", ctx)
+            raise InterpretError(
+                "Can not get NFA from " + str(holder.value_type) + " type", ctx
+            )
 
-    def get_nfa_with_states_set(self, fa: FLValueHolder, states: FLValueHolder, ctx) -> (EpsilonNFA, Set):
+    def get_nfa_with_states_set(
+        self, fa: FLValueHolder, states: FLValueHolder, ctx
+    ) -> (EpsilonNFA, Set):
         if fa.value_type is FLValueType.FiniteAutomataValue:
             nfa = fa.value
         elif fa.value_type is FLValueType.StringValue:
             nfa = regex_to_min_dfa(fa.value)
         else:
-            raise InterpretError("Can not get NFA from " + str(fa.value_type) + " type", ctx)
+            raise InterpretError(
+                "Can not get NFA from " + str(fa.value_type) + " type", ctx
+            )
 
         if states.value_type is FLValueType.SetValue:
             states_set = states.value
         else:
-            raise InterpretError("Can not get states from " + str(states.value_type) + " type", ctx)
+            raise InterpretError(
+                "Can not get states from " + str(states.value_type) + " type", ctx
+            )
 
         return nfa, states_set
 
-    def add_starts(self, to: FLValueHolder, starts: FLValueHolder, ctx) -> FLValueHolder:
+    def add_starts(
+        self, to: FLValueHolder, starts: FLValueHolder, ctx
+    ) -> FLValueHolder:
         nfa, starts_set = self.get_nfa_with_states_set(to, starts, ctx)
         for node in starts_set:
             nfa.add_start_state(node)
-        result = FLValueHolder(value=nfa, ctx=ctx, value_type=FLValueType.FiniteAutomataValue)
+        result = FLValueHolder(
+            value=nfa, ctx=ctx, value_type=FLValueType.FiniteAutomataValue
+        )
         return result
 
-    def add_finals(self, to: FLValueHolder, finals: FLValueHolder, ctx) -> FLValueHolder:
+    def add_finals(
+        self, to: FLValueHolder, finals: FLValueHolder, ctx
+    ) -> FLValueHolder:
         nfa, finals_set = self.get_nfa_with_states_set(to, finals, ctx)
         for node in finals_set:
             nfa.add_final_state(node)
-        result = FLValueHolder(value=nfa, ctx=ctx, value_type=FLValueType.FiniteAutomataValue)
+        result = FLValueHolder(
+            value=nfa, ctx=ctx, value_type=FLValueType.FiniteAutomataValue
+        )
         return result
 
-    def set_starts(self, to: FLValueHolder, starts: FLValueHolder, ctx) -> FLValueHolder:
+    def set_starts(
+        self, to: FLValueHolder, starts: FLValueHolder, ctx
+    ) -> FLValueHolder:
         nfa, starts_set = self.get_nfa_with_states_set(to, starts, ctx)
         nfa.start_states.clear()
         for node in starts_set:
             nfa.add_start_state(node)
-        result = FLValueHolder(value=nfa, ctx=ctx, value_type=FLValueType.FiniteAutomataValue)
+        result = FLValueHolder(
+            value=nfa, ctx=ctx, value_type=FLValueType.FiniteAutomataValue
+        )
         return result
 
-    def set_finals(self, to: FLValueHolder, finals: FLValueHolder, ctx) -> FLValueHolder:
+    def set_finals(
+        self, to: FLValueHolder, finals: FLValueHolder, ctx
+    ) -> FLValueHolder:
         nfa, finals_set = self.get_nfa_with_states_set(to, finals, ctx)
         nfa.final_states.clear()
         for node in finals_set:
             nfa.add_final_state(node)
-        result = FLValueHolder(value=nfa, ctx=ctx, value_type=FLValueType.FiniteAutomataValue)
+        result = FLValueHolder(
+            value=nfa, ctx=ctx, value_type=FLValueType.FiniteAutomataValue
+        )
         return result
 
     def get_reachable(self, value: FLValueHolder, ctx) -> FLValueHolder:
@@ -104,9 +130,13 @@ class InterpretVisitor(FLVisitor):
         if value.value_type is FLValueType.StringValue:
             dfa = regex_to_min_dfa(value.value)
         elif value.value_type is not FLValueType.FiniteAutomataValue:
-            InterpretError("Cannot get reachable vertices from " + str(value.value_type), ctx)
+            InterpretError(
+                "Cannot get reachable vertices from " + str(value.value_type), ctx
+            )
         reachable = dfa._get_reachable_states()
-        result = FLValueHolder(value=reachable, ctx=ctx, value_type=FLValueType.SetValue)
+        result = FLValueHolder(
+            value=reachable, ctx=ctx, value_type=FLValueType.SetValue
+        )
         return result
 
     def get_vertices(self, value: FLValueHolder, ctx) -> FLValueHolder:
@@ -116,7 +146,9 @@ class InterpretVisitor(FLVisitor):
         elif value.value_type is not FLValueType.FiniteAutomataValue:
             InterpretError("Cannot get vertices from " + str(value.value_type), ctx)
         reachable = dfa.states
-        result = FLValueHolder(value=reachable, ctx=ctx, value_type=FLValueType.SetValue)
+        result = FLValueHolder(
+            value=reachable, ctx=ctx, value_type=FLValueType.SetValue
+        )
         return result
 
     def get_edges(self, value: FLValueHolder, ctx) -> FLValueHolder:
@@ -140,14 +172,27 @@ class InterpretVisitor(FLVisitor):
         result = FLValueHolder(value=labels, ctx=ctx, value_type=FLValueType.SetValue)
         return result
 
-    def compare_holders(self, lhs: FLValueHolder, rhs: FLValueHolder, ctx) -> FLValueHolder:
+    def compare_holders(
+        self, lhs: FLValueHolder, rhs: FLValueHolder, ctx
+    ) -> FLValueHolder:
         if lhs.value_type is not rhs.value_type:
-            raise InterpretError("Incomparable types: " + str(lhs.value_type) + " and " + str(rhs.value_type), ctx)
+            raise InterpretError(
+                "Incomparable types: "
+                + str(lhs.value_type)
+                + " and "
+                + str(rhs.value_type),
+                ctx,
+            )
         result = lhs.value == rhs.value
         return FLValueHolder(value=result, ctx=ctx, value_type=FLValueType.BoolValue)
 
-    def contains_value(self, lhs: FLValueHolder, rhs: FLValueHolder, ctx) -> FLValueHolder:
-        if lhs.value_type is FLValueType.StringValue and rhs.value_type is FLValueType.StringValue:
+    def contains_value(
+        self, lhs: FLValueHolder, rhs: FLValueHolder, ctx
+    ) -> FLValueHolder:
+        if (
+            lhs.value_type is FLValueType.StringValue
+            and rhs.value_type is FLValueType.StringValue
+        ):
             result = lhs.value in rhs.value
         elif rhs.value_type is FLValueType.SetValue:
             result = lhs.value in rhs.value
@@ -159,69 +204,166 @@ class InterpretVisitor(FLVisitor):
             elif lhs.value_type is FLValueType.FiniteAutomataValue:
                 result = lhs.value == intersect_enfa(lhs.value, rhs.value)
             else:
-                raise InterpretError("In is not supported by "+str(lhs.value_type)+" and "+str(rhs.value_type), ctx)
+                raise InterpretError(
+                    "In is not supported by "
+                    + str(lhs.value_type)
+                    + " and "
+                    + str(rhs.value_type),
+                    ctx,
+                )
         else:
-            raise InterpretError("In is not supported by "+str(lhs.value_type)+" and "+str(rhs.value_type), ctx)
+            raise InterpretError(
+                "In is not supported by "
+                + str(lhs.value_type)
+                + " and "
+                + str(rhs.value_type),
+                ctx,
+            )
 
         return FLValueHolder(value=result, ctx=ctx, value_type=FLValueType.BoolValue)
 
-    def intersect_holders(self, lhs: FLValueHolder, rhs: FLValueHolder, ctx) -> FLValueHolder:
-        if lhs.value_type is FLValueType.BoolValue and rhs.value_type is FLValueType.BoolValue:
+    def intersect_holders(
+        self, lhs: FLValueHolder, rhs: FLValueHolder, ctx
+    ) -> FLValueHolder:
+        if (
+            lhs.value_type is FLValueType.BoolValue
+            and rhs.value_type is FLValueType.BoolValue
+        ):
             result = lhs.value and rhs.value_type
-            result = FLValueHolder(value=result, ctx=ctx, value_type=FLValueType.BoolValue)
+            result = FLValueHolder(
+                value=result, ctx=ctx, value_type=FLValueType.BoolValue
+            )
         elif lhs.value_type is FLValueType.StringValue:
             if rhs.value_type is FLValueType.StringValue:
-                result = ''.join(set(lhs.value).intersection(rhs.value))
-                result = FLValueHolder(value=result, ctx=ctx, value_type=FLValueType.StringValue)
+                result = "".join(set(lhs.value).intersection(rhs.value))
+                result = FLValueHolder(
+                    value=result, ctx=ctx, value_type=FLValueType.StringValue
+                )
             elif rhs.value_type is FLValueType.FiniteAutomataValue:
                 intersection = intersect_enfa(regex_to_min_dfa(lhs.value), rhs.value)
-                result = FLValueHolder(value=intersection, ctx=ctx, value_type=FLValueType.FiniteAutomataValue)
+                result = FLValueHolder(
+                    value=intersection,
+                    ctx=ctx,
+                    value_type=FLValueType.FiniteAutomataValue,
+                )
             else:
-                raise InterpretError("Cannot intersect " + str(lhs.value_type) + " and " + str(rhs.value_type), ctx)
-        elif lhs.value_type is FLValueType.SetValue and rhs.value_type is FLValueType.SetValue:
+                raise InterpretError(
+                    "Cannot intersect "
+                    + str(lhs.value_type)
+                    + " and "
+                    + str(rhs.value_type),
+                    ctx,
+                )
+        elif (
+            lhs.value_type is FLValueType.SetValue
+            and rhs.value_type is FLValueType.SetValue
+        ):
             result = lhs.value.intersection(rhs.value)
-            result = FLValueHolder(value=result, ctx=ctx, value_type=FLValueType.SetValue)
+            result = FLValueHolder(
+                value=result, ctx=ctx, value_type=FLValueType.SetValue
+            )
         elif lhs.value_type is FLValueType.FiniteAutomataValue:
             if rhs.value_type is FLValueType.StringValue:
                 intersection = intersect_enfa(lhs.value, regex_to_min_dfa(rhs.value))
-                result = FLValueHolder(value=intersection, ctx=ctx, value_type=FLValueType.FiniteAutomataValue)
+                result = FLValueHolder(
+                    value=intersection,
+                    ctx=ctx,
+                    value_type=FLValueType.FiniteAutomataValue,
+                )
             elif rhs.value_type is FLValueType.FiniteAutomataValue:
                 intersection = intersect_enfa(lhs.value, rhs.value)
-                result = FLValueHolder(value=intersection, ctx=ctx, value_type=FLValueType.FiniteAutomataValue)
+                result = FLValueHolder(
+                    value=intersection,
+                    ctx=ctx,
+                    value_type=FLValueType.FiniteAutomataValue,
+                )
             else:
-                raise InterpretError("Cannot intersect " + str(lhs.value_type) + " and " + str(rhs.value_type), ctx)
+                raise InterpretError(
+                    "Cannot intersect "
+                    + str(lhs.value_type)
+                    + " and "
+                    + str(rhs.value_type),
+                    ctx,
+                )
         else:
-            raise InterpretError("Cannot intersect " + str(lhs.value_type) + " and " + str(rhs.value_type), ctx)
+            raise InterpretError(
+                "Cannot intersect "
+                + str(lhs.value_type)
+                + " and "
+                + str(rhs.value_type),
+                ctx,
+            )
 
         return result
 
-    def concat_holders(self, lhs: FLValueHolder, rhs: FLValueHolder, ctx) -> FLValueHolder:
-        if lhs.value_type is FLValueType.BoolValue and rhs.value_type is FLValueType.BoolValue:
+    def concat_holders(
+        self, lhs: FLValueHolder, rhs: FLValueHolder, ctx
+    ) -> FLValueHolder:
+        if (
+            lhs.value_type is FLValueType.BoolValue
+            and rhs.value_type is FLValueType.BoolValue
+        ):
             result = lhs.value or rhs.value_type
-            result = FLValueHolder(value=result, ctx=ctx, value_type=FLValueType.BoolValue)
+            result = FLValueHolder(
+                value=result, ctx=ctx, value_type=FLValueType.BoolValue
+            )
         elif lhs.value_type is FLValueType.StringValue:
             if rhs.value_type is FLValueType.StringValue:
                 result = lhs.value + rhs.value
-                result = FLValueHolder(value=result, ctx=ctx, value_type=FLValueType.StringValue)
+                result = FLValueHolder(
+                    value=result, ctx=ctx, value_type=FLValueType.StringValue
+                )
             elif rhs.value_type is FLValueType.FiniteAutomataValue:
                 intersection = concat(regex_to_min_dfa(lhs.value), rhs.value)
-                result = FLValueHolder(value=intersection, ctx=ctx, value_type=FLValueType.FiniteAutomataValue)
+                result = FLValueHolder(
+                    value=intersection,
+                    ctx=ctx,
+                    value_type=FLValueType.FiniteAutomataValue,
+                )
             else:
-                raise InterpretError("Cannot concat " + str(lhs.value_type) + " and " + str(rhs.value_type), ctx)
-        elif lhs.value_type is FLValueType.SetValue and rhs.value_type is FLValueType.SetValue:
+                raise InterpretError(
+                    "Cannot concat "
+                    + str(lhs.value_type)
+                    + " and "
+                    + str(rhs.value_type),
+                    ctx,
+                )
+        elif (
+            lhs.value_type is FLValueType.SetValue
+            and rhs.value_type is FLValueType.SetValue
+        ):
             result = lhs.value.union(rhs.value)
-            result = FLValueHolder(value=result, ctx=ctx, value_type=FLValueType.SetValue)
+            result = FLValueHolder(
+                value=result, ctx=ctx, value_type=FLValueType.SetValue
+            )
         elif lhs.value_type is FLValueType.FiniteAutomataValue:
             if rhs.value_type is FLValueType.StringValue:
                 intersection = concat(lhs.value, regex_to_min_dfa(rhs.value))
-                result = FLValueHolder(value=intersection, ctx=ctx, value_type=FLValueType.FiniteAutomataValue)
+                result = FLValueHolder(
+                    value=intersection,
+                    ctx=ctx,
+                    value_type=FLValueType.FiniteAutomataValue,
+                )
             elif rhs.value_type is FLValueType.FiniteAutomataValue:
                 intersection = concat(lhs.value, rhs.value)
-                result = FLValueHolder(value=intersection, ctx=ctx, value_type=FLValueType.FiniteAutomataValue)
+                result = FLValueHolder(
+                    value=intersection,
+                    ctx=ctx,
+                    value_type=FLValueType.FiniteAutomataValue,
+                )
             else:
-                raise InterpretError("Cannot concat " + str(lhs.value_type) + " and " + str(rhs.value_type), ctx)
+                raise InterpretError(
+                    "Cannot concat "
+                    + str(lhs.value_type)
+                    + " and "
+                    + str(rhs.value_type),
+                    ctx,
+                )
         else:
-            raise InterpretError("Cannot concat " + str(lhs.value_type) + " and " + str(rhs.value_type), ctx)
+            raise InterpretError(
+                "Cannot concat " + str(lhs.value_type) + " and " + str(rhs.value_type),
+                ctx,
+            )
         return result
 
     @property
@@ -272,14 +414,18 @@ class InterpretVisitor(FLVisitor):
     # Visit a parse tree produced by FLParser#val_string.
     def visitVal_string(self, ctx: FLParser.Val_stringContext):
         self.enter_ctx(ctx)
-        string = FLValueHolder(value=eval(ctx.value.text), ctx=ctx, value_type=FLValueType.StringValue)
+        string = FLValueHolder(
+            value=eval(ctx.value.text), ctx=ctx, value_type=FLValueType.StringValue
+        )
         self.exit_ctx()
         return string
 
     # Visit a parse tree produced by FLParser#val_int.
     def visitVal_int(self, ctx: FLParser.Val_stringContext):
         self.enter_ctx(ctx)
-        integer = FLValueHolder(value=eval(ctx.value.text), ctx=ctx, value_type=FLValueType.IntValue)
+        integer = FLValueHolder(
+            value=eval(ctx.value.text), ctx=ctx, value_type=FLValueType.IntValue
+        )
         self.exit_ctx()
         return integer
 
@@ -320,7 +466,9 @@ class InterpretVisitor(FLVisitor):
         self.enter_ctx(ctx)
         value = ctx.value.accept(self)
         dfa = self.get_nfa_from_holder(value, ctx)
-        result = FLValueHolder(value=dfa.value.final_states, ctx=ctx, value_type=FLValueType.SetValue)
+        result = FLValueHolder(
+            value=dfa.value.final_states, ctx=ctx, value_type=FLValueType.SetValue
+        )
         self.exit_ctx()
         return result
 
@@ -356,7 +504,9 @@ class InterpretVisitor(FLVisitor):
         self.enter_ctx(ctx)
         value = ctx.value.accept(self)
         dfa = self.get_nfa_from_holder(value, ctx)
-        result = FLValueHolder(value=dfa.value.start_states, ctx=ctx, value_type=FLValueType.SetValue)
+        result = FLValueHolder(
+            value=dfa.value.start_states, ctx=ctx, value_type=FLValueType.SetValue
+        )
         self.exit_ctx()
         return result
 
@@ -396,7 +546,9 @@ class InterpretVisitor(FLVisitor):
     def visitExpr_load(self, ctx: FLParser.Expr_loadContext):
         self.enter_ctx(ctx)
         graph = graph_to_nfa(get_nx_graph_by_name(eval(ctx.value.text)))
-        result = FLValueHolder(value=graph, ctx=ctx, value_type=FLValueType.FiniteAutomataValue)
+        result = FLValueHolder(
+            value=graph, ctx=ctx, value_type=FLValueType.FiniteAutomataValue
+        )
         self.exit_ctx()
         return result
 
@@ -445,7 +597,9 @@ class InterpretVisitor(FLVisitor):
         left_value = ctx.left.accept(self)
         right_value = ctx.right.accept(self)
         result = self.compare_holders(left_value, right_value, ctx)
-        result = FLValueHolder(value=not result.value, ctx=ctx, value_type=FLValueType.BoolValue)
+        result = FLValueHolder(
+            value=not result.value, ctx=ctx, value_type=FLValueType.BoolValue
+        )
         self.exit_ctx()
         return result
 
