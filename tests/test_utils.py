@@ -1,6 +1,6 @@
-from typing import List
-
 import pydot
+
+from typing import List
 from pyformlang.finite_automaton import EpsilonNFA
 from networkx import MultiDiGraph
 
@@ -42,7 +42,7 @@ def deep_compare(a_graph: pydot.Dot, b_graph: pydot.Dot) -> bool:
     def strip_label(lab: str):
         return lab.strip('"')
 
-    def get_neighbors(edges: List[pydot.Edge]) -> List[pydot.Node]:
+    def get_neighbors(edges: List[pydot.Edge]) -> List[pydot.Node] | bool:
         result = []
         for edge in filter(lambda e: e.get_source() == a.get_name(), edges):
             nodes = a_graph.get_node(edge.get_destination())

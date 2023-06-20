@@ -2,7 +2,7 @@ from pyformlang.cfg import Variable
 from pyformlang.regular_expression import Regex
 
 from project.ecfg import ECFG
-from project.recursive_automatons import RecursiveAutomata
+from project.recursive_automaton import RecursiveAutomata
 
 
 def test_recursive_automata():
