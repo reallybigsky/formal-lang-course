@@ -63,7 +63,12 @@ def parse_stream(stream: InputStream, rule_name: str = "program"):
     return result
 
 
-def parse(input_string: str = None, rule_name: str = "program", input_type: InputType = InputType.TEXT, encoding: str = "utf-8"):
+def parse(
+    input_string: str = None,
+    rule_name: str = "program",
+    input_type: InputType = InputType.TEXT,
+    encoding: str = "utf-8",
+):
     """
     Parse input string depending on the provided input type
     """
