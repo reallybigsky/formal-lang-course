@@ -1,8 +1,17 @@
+import io
 import pydot
 
 from typing import List
 from pyformlang.finite_automaton import EpsilonNFA
 from networkx import MultiDiGraph
+from project.language.interpreter import interpret
+
+
+def interpret_to_str(*args, **kwargs):
+    with io.StringIO() as output:
+        kwargs["out"] = output
+        interpret(*args, **kwargs)
+        return output.getvalue()
 
 
 def create_automata(

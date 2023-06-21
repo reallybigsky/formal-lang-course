@@ -3,7 +3,7 @@
 ### Генерация файлов antlr
 
 ```shell
-antlr4 FL.g4 -Dlanguage=Python3 -o dist
+antlr4 FL.g4 -Dlanguage=Python3 -visitor -o dist
 ```
 
 ### Абстрактный синтаксис
